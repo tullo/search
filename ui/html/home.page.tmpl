@@ -1,0 +1,36 @@
+{{template "base" .}}
+
+{{define "title"}}Home{{end}}
+
+{{define "main"}}
+    <h2>Latest Products</h2>
+    {{if .Products}}
+        <table class="table">
+            <thead>
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">Name</th>
+                    <th scope="col">Cost</th>
+                    <th scope="col">Quantity</th>
+                    <th scope="col">Sold</th>
+                    <th scope="col">Revenue</th>
+                </tr>
+            </thead>
+            <tbody>
+                {{$path := .Path}}
+                {{range $index, $p := .Products}}
+                <tr>
+                    <th scope="row">{{$index | incr}}</th>
+                    <td><a href="{{$path}}/{{$p.ID}}">{{$p.NameHTML}}</a></td>
+                    <td>{{$p.Cost}}</td>
+                    <td>{{$p.Quantity}}</td>
+                    <td>{{$p.Sold}}</td>
+                    <td>{{$p.Revenue}}</td>
+                </tr>
+                {{end}}
+            </tbody>
+        </table>
+    {{else}}
+        <p>There's nothing to see here... yet!</p>
+    {{end}}
+{{end}}

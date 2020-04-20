@@ -1,0 +1,32 @@
+# github.com/ardanlabs/conf v1.2.1
+## explicit
+github.com/ardanlabs/conf
+# github.com/bmizerany/pat v0.0.0-20170815010413-6226ea591a40
+## explicit
+github.com/bmizerany/pat
+# github.com/dgrijalva/jwt-go v3.2.0+incompatible
+## explicit
+github.com/dgrijalva/jwt-go
+# github.com/golangcollege/sessions v1.2.0
+## explicit
+github.com/golangcollege/sessions
+# github.com/google/go-cmp v0.4.0
+## explicit
+# github.com/justinas/alice v1.2.0
+## explicit
+github.com/justinas/alice
+# github.com/justinas/nosurf v1.1.0
+## explicit
+github.com/justinas/nosurf
+# github.com/pkg/errors v0.9.1
+## explicit
+github.com/pkg/errors
+# golang.org/x/crypto v0.0.0-20200414173820-0848c9571904
+## explicit
+golang.org/x/crypto/internal/subtle
+golang.org/x/crypto/nacl/secretbox
+golang.org/x/crypto/poly1305
+golang.org/x/crypto/salsa20/salsa
+# golang.org/x/sys v0.0.0-20200413165638-669c56c373c4
+## explicit
+golang.org/x/sys/cpu

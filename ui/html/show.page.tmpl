@@ -1,0 +1,36 @@
+{{template "base" .}}
+
+{{define "title"}}Product {{shortID .Product.ID}}{{end}}
+
+{{define "main"}}
+    <h2>Product: {{.Product.Name}}</h2>
+    <div class='snippet'>
+        <div class='metadata'>
+            <strong>{{.Product.Name}}</strong>
+            <span><a href="/snippet/{{.Product.ID}}/edit">Edit</a></span>
+        </div>
+        <table>
+            <thead>
+                <tr>
+                    <th scope="col">Cost</th>
+                    <th scope="col">Quantity</th>
+                    <th scope="col">Sold</th>
+                    <th scope="col">Revenue</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>{{.Product.Cost}}</td>
+                    <td>{{.Product.Quantity}}</td>
+                    <td>{{.Product.Sold}}</td>
+                    <td>{{.Product.Revenue}}</td>
+                </tr>
+            </tbody>
+        </table>
+        <div class='metadata'>
+            {{- /* custom template fn humanDate */ -}}
+            <time>Created: {{humanDate .Product.DateCreated}}</time>
+            <time>Updated: {{humanDate .Product.DateUpdated}}</time>
+        </div>
+    </div>
+{{- end}}
