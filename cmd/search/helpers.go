@@ -12,7 +12,7 @@ import (
 	"github.com/justinas/nosurf"
 )
 
-func (app *application) newRequest(ctx context.Context, r *http.Request, url string) (*http.Request, error) {
+func (app *application) newGetRequest(ctx context.Context, r *http.Request, url string) (*http.Request, error) {
 	req, err := http.NewRequest(http.MethodGet, url, nil)
 	if err != nil {
 		return nil, err

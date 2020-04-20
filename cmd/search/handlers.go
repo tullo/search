@@ -20,7 +20,7 @@ func (app *application) home(w http.ResponseWriter, r *http.Request) {
 	defer cancel()
 
 	url := fmt.Sprintf("%s/products", app.salesURL)
-	req, err := app.newRequest(ctx, r, url)
+	req, err := app.newGetRequest(ctx, r, url)
 	if err != nil {
 		app.serverError(w, err)
 		return
@@ -59,7 +59,7 @@ func (app *application) showProduct(w http.ResponseWriter, r *http.Request) {
 
 	id := r.URL.Query().Get(":id")
 	url := fmt.Sprintf("%s/products/%s", app.salesURL, id)
-	req, err := app.newRequest(ctx, r, url)
+	req, err := app.newGetRequest(ctx, r, url)
 	if err != nil {
 		app.serverError(w, err)
 		return
@@ -114,7 +114,7 @@ func (app *application) loginUser(w http.ResponseWriter, r *http.Request) {
 	defer cancel()
 
 	url := fmt.Sprintf("%s/users/token", app.salesURL)
-	req, err := app.newRequest(ctx, r, url)
+	req, err := app.newGetRequest(ctx, r, url)
 	if err != nil {
 		app.serverError(w, err)
 		return
@@ -186,7 +186,7 @@ func (app *application) userProfile(w http.ResponseWriter, r *http.Request) {
 	// get user ID from session data
 	userID := app.session.GetString(r, "authenticatedUserID")
 	url := fmt.Sprintf("%s/users/%s", app.salesURL, userID)
-	req, err := app.newRequest(ctx, r, url)
+	req, err := app.newGetRequest(ctx, r, url)
 	if err != nil {
 		app.serverError(w, err)
 		return
