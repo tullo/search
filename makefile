@@ -76,7 +76,7 @@ deployment:
 	kubectl apply -f ./k8s/deploy-search-app.yaml
 	@echo
 	watch kubectl get pod,svc
-#	kubectl logs -f deployment/search-app --container search-app
+#	kubectl logs --tail=20 -f deployment/search-app --container search-app
 
 delete:
 	kubectl delete -f ./k8s/deploy-search-app.yaml
