@@ -9,7 +9,7 @@ export DOCKER_BUILDKIT = 1
 all: search test-cover-profile test-cover-text
 
 go-run:
-	go run ./cmd/search --db-disable-tls=1
+	go run ./cmd/search --web-enable-tls=true
 
 search:
 	docker build \
@@ -22,6 +22,15 @@ search:
 	docker image tag \
 		$(REGISTRY_ACCOUNT)/search-amd64:$(VERSION) \
 		gcr.io/$(PROJECT)/search-amd64:$(VERSION)
+
+okteto-build:
+	okteto build \
+		-f Dockerfile \
+		-t registry.cloud.okteto.net/$(REGISTRY_ACCOUNT)/search-app-amd64:$(VERSION) \
+		--build-arg PACKAGE_NAME=search \
+		--build-arg VCS_REF=`git rev-parse HEAD` \
+		--build-arg BUILD_DATE=`date -u +”%Y-%m-%dT%H:%M:%SZ”` \
+		.
 
 up:
 	docker-compose up --remove-orphans
@@ -59,3 +68,17 @@ deps-upgrade:
 
 deps-cleancache:
 	go clean -modcache
+
+dry-run:
+	kubectl apply --dry-run=client -f ./k8s/deploy-search-app.yaml -o yaml
+
+deployment:
+	kubectl apply -f ./k8s/deploy-search-app.yaml
+	@echo
+	watch kubectl get pod,svc
+#	kubectl logs -f deployment/search-app --container search-app
+
+delete:
+	kubectl delete -f ./k8s/deploy-search-app.yaml
+	@echo
+	watch kubectl get pod,svc
