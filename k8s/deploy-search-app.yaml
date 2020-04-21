@@ -1,0 +1,57 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: search-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      service: search-app
+  template:
+    metadata:
+      name: search-app
+      labels:
+        service: search-app
+    spec:
+      securityContext:
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
+      containers:
+      - name: search-app
+        image: registry.cloud.okteto.net/tullo/search-app-amd64:0.1.0
+        env:
+        - name: SEARCH_WEB_HOST
+          value: :8080
+        - name: SEARCH_WEB_SESSION_SECRET
+          value: JH3sYT0VoK9yZPK4KS1qYyJZ4FkE3e7sXy9Af5mcO+Q=
+        - name: SEARCH_SALES_BASE_URL
+          value: http://sales-api:8080/v1
+        - name: SEARCH_SALES_IDLE_TIMEOUT
+          value: 1m
+        - name: SEARCH_SALES_READ_TIMEOUT
+          value: 5s
+        - name: SEARCH_SALES_WRITE_TIMEOUT
+          value: 5s
+        ports:
+        - name: search-app
+          containerPort: 8080
+        resources:
+          limits:
+            cpu: 100m
+            memory: 128Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: search-app
+  annotations:
+    dev.okteto.com/auto-ingress: "true"
+spec:
+  type: ClusterIP
+  ports:
+  - name: "search-app"
+    port: 8080
+    targetPort: 8080
+  selector:
+    service: search-app
