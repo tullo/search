@@ -29,9 +29,11 @@ FROM alpine:3.11
 ARG BUILD_DATE
 ARG VCS_REF
 ARG PACKAGE_NAME
-COPY --from=build_stage /app/cmd/${PACKAGE_NAME}/${PACKAGE_NAME} /app/main
-COPY --from=build_stage /app/ui /app/ui
-COPY --from=build_stage /app/tls /app/tls
+RUN addgroup -g 1000 -S app && adduser -u 1000 -S app -G app --no-create-home --disabled-password
+USER app
+COPY --from=build_stage --chown=app:app /app/cmd/${PACKAGE_NAME}/${PACKAGE_NAME} /app/main
+COPY --from=build_stage --chown=app:app /app/ui /app/ui
+COPY --from=build_stage --chown=app:app /app/tls /app/tls
 WORKDIR /app
 CMD ["/app/main"]
 
