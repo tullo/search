@@ -34,6 +34,7 @@ type application struct {
 	session       *sessions.Session
 	shutdown      chan os.Signal
 	templateCache map[string]*template.Template
+	useTLS        bool
 	users         interface {
 		Authenticate(string, string) (string, error)
 	}
@@ -64,6 +65,7 @@ func run() error {
 		Web struct {
 			Host            string        `conf:"default::4200"`
 			DebugMode       bool          `conf:"default:false"`
+			EnableTLS       bool          `conf:"default:false"`
 			SessionSecret   string        `conf:"default:M+ZrbJjvTLvXOvihe+Rjlr/ccfGjmFReGtLcV7gSufg="`
 			IdleTimeout     time.Duration `conf:"default:1m"`
 			ReadTimeout     time.Duration `conf:"default:5s"`
@@ -127,6 +129,7 @@ func run() error {
 		session:       session,
 		shutdown:      shutdown,
 		templateCache: templateCache,
+		useTLS:        cfg.Web.EnableTLS,
 	}
 
 	// use Go’s favored cipher suites (support for forward secrecy)
@@ -153,7 +156,10 @@ func run() error {
 	// Start the application listening for requests.
 	go func() {
 		infoLog.Printf("Starting server on %s", cfg.Web.Host)
-		serverErrors <- srv.ListenAndServeTLS("./tls/localhost/cert.pem", "./tls/localhost/key.pem")
+		if app.useTLS {
+			serverErrors <- srv.ListenAndServeTLS("./tls/localhost/cert.pem", "./tls/localhost/key.pem")
+		}
+		serverErrors <- srv.ListenAndServe()
 	}()
 
 	// =========================================================================
