@@ -5,6 +5,7 @@ export REGISTRY_HOSTNAME = docker.io
 export REGISTRY_ACCOUNT = tullo
 export VERSION = 0.1.0
 export DOCKER_BUILDKIT = 1
+export SESSION_SECRET := $(shell openssl rand -base64 32)
 
 all: search test-cover-profile test-cover-text
 
@@ -31,6 +32,9 @@ okteto-build:
 		--build-arg VCS_REF=`git rev-parse HEAD` \
 		--build-arg BUILD_DATE=`date -u +”%Y-%m-%dT%H:%M:%SZ”` \
 		.
+
+config:
+	docker-compose config
 
 up:
 	docker-compose up --remove-orphans
@@ -82,3 +86,7 @@ delete:
 	kubectl delete -f ./k8s/deploy-search-app.yaml
 	@echo
 	watch kubectl get pod,svc
+
+#rollout:
+#	kubectl rollout restart deployment/search-app
+#	kubectl exec -it pod/search-app-644654fddb-nsl9h -- env

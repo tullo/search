@@ -3,7 +3,7 @@ version: '3'
 services:
   search:
     container_name: search
-    image: tullo/search-amd64:0.1.0
+    image: ${REGISTRY_ACCOUNT}/search-amd64:${VERSION}
     networks:
       - outside
     ports:
@@ -11,7 +11,7 @@ services:
     environment:
       - SEARCH_WEB_HOST=:4200
       - SEARCH_WEB_ENABLE_TLS=true
-      - SEARCH_WEB_SESSION_SECRET=JH3sYT0VoK9yZPK4KS1qYyJZ4FkE3e7sXy9Af5mcO+Q=
+      - SEARCH_WEB_SESSION_SECRET=${SESSION_SECRET}
       - SEARCH_WEB_IDLE_TIMEOUT=1m
       - SEARCH_WEB_READ_TIMEOUT=5s
       - SEARCH_WEB_WRITE_TIMEOUT=5s
