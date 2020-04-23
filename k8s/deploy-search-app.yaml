@@ -49,8 +49,18 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: status.podIP
+        - name: AIT_CPU_LIMIT
+          valueFrom:
+            resourceFieldRef:
+              containerName: search-app
+              resource: limits.cpu
+        - name: AIT_MEM_LIMIT
+          valueFrom:
+            resourceFieldRef:
+              containerName: search-app
+              resource: limits.memory
         ports:
-        - name: search-app
+        - name: http
           containerPort: 8080
         resources:
           limits:
