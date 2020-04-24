@@ -70,10 +70,13 @@ spec:
           httpGet:
             path: /ping
             port: http
+            httpHeaders:
+              - name: X-Probe
+                value: LivenessProbe
           initialDelaySeconds: 5
           periodSeconds: 20
           timeoutSeconds: 1
-          failureThreshold: 3
+          failureThreshold: 5
           successThreshold: 1
         readinessProbe:
           httpGet:
