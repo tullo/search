@@ -137,6 +137,21 @@ func (ts *testServer) postForm(t *testing.T, urlPath string, form url.Values) (i
 	return rs.StatusCode, rs.Header, body
 }
 
+func (ts *testServer) clientDo(t *testing.T, r *http.Request) (int, http.Header, []byte) {
+	rs, err := ts.Client().Do(r)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer rs.Body.Close()
+
+	body, err := ioutil.ReadAll(rs.Body)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	return rs.StatusCode, rs.Header, body
+}
+
 func (ts *testServer) getCheckRedirect(t *testing.T, urlPath string, s *sessions.Session) (int, http.Header, []byte) {
 	client := ts.Client()
 	client.CheckRedirect = func(req *http.Request, via []*http.Request) error {

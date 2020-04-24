@@ -2,6 +2,8 @@ package main
 
 import (
 	"bytes"
+	"context"
+	"fmt"
 	"net/http"
 	"net/url"
 	"testing"
@@ -14,6 +16,30 @@ func TestPing(t *testing.T) {
 	defer ts.Close()
 
 	code, _, body := ts.get(t, "/ping")
+	if code != http.StatusOK {
+		t.Errorf("want %d; got %d", http.StatusOK, code)
+	}
+
+	if string(body) != "OK" {
+		t.Errorf("want body to equal %q", "OK")
+	}
+}
+
+func TestLivenessProbe(t *testing.T) {
+
+	app := newTestApplication(t)
+	ts := newTestServer(t, app.routes())
+	defer ts.Close()
+
+	url := fmt.Sprintf("%s/ping", ts.URL)
+	req, err := http.NewRequestWithContext(context.Background(), http.MethodGet, url, nil)
+	if err != nil {
+		t.Errorf("creating request %s", err)
+	}
+
+	req.Header.Set("X-Probe", "LivenessProbe")
+	code, _, body := ts.clientDo(t, req)
+
 	if code != http.StatusOK {
 		t.Errorf("want %d; got %d", http.StatusOK, code)
 	}

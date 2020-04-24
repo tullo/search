@@ -21,6 +21,8 @@ func secureHeaders(next http.Handler) http.Handler {
 // noSurf uses a customized CSRF cookie with the Secure, Path and HttpOnly flags set
 func noSurf(next http.Handler) http.Handler {
 	csrfHandler := nosurf.New(next)
+	paths := []string{"/ping", "/about"}
+	csrfHandler.ExemptPaths(paths...)
 	csrfHandler.SetBaseCookie(http.Cookie{
 		Domain:   "",
 		HttpOnly: true,

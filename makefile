@@ -91,3 +91,6 @@ delete:
 #rollout:
 #	kubectl rollout restart deployment/search-app
 #	kubectl exec -it pod/search-app-644654fddb-nsl9h -- env
+
+ping:
+	curl -k -H "X-Probe: LivenessProbe" https://0.0.0.0:4200/ping; echo
