@@ -5,6 +5,7 @@ export REGISTRY_HOSTNAME = docker.io
 export REGISTRY_ACCOUNT = tullo
 export VERSION = 0.1.0
 export DOCKER_BUILDKIT = 1
+export SALES_URL = http://0.0.0.0:3000/v1
 export SESSION_SECRET := $(shell openssl rand -base64 32)
 
 all: search test-cover-profile test-cover-text
