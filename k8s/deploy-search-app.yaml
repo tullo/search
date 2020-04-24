@@ -4,6 +4,7 @@ metadata:
   name: search-app
 spec:
   replicas: 1
+  revisionHistoryLimit: 2
   selector:
     matchLabels:
       service: search-app
@@ -74,17 +75,17 @@ spec:
               - name: X-Probe
                 value: LivenessProbe
           initialDelaySeconds: 5
-          periodSeconds: 20
-          timeoutSeconds: 1
+          periodSeconds: 45
+          timeoutSeconds: 10
           failureThreshold: 5
           successThreshold: 1
         readinessProbe:
           httpGet:
             path: /ping
             port: http
-          initialDelaySeconds: 15
+          initialDelaySeconds: 20
           periodSeconds: 10
-          timeoutSeconds: 1
+          timeoutSeconds: 2
           failureThreshold: 5
           successThreshold: 1
 ---
