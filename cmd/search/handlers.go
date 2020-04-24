@@ -105,8 +105,7 @@ func (app *application) loginUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Check whether the credentials are valid. If they're not, add a generic error
-	// message to the form failures map and re-display the login page.
+	// Initialize a form struct using form data.
 	form := forms.New(r.PostForm)
 
 	// Create a context with a timeout of 1 second.
@@ -121,6 +120,7 @@ func (app *application) loginUser(w http.ResponseWriter, r *http.Request) {
 	}
 	req.SetBasicAuth(form.Get("email"), form.Get("password"))
 
+	// Login with provided credentials.
 	// Do will handle the context level timeout.
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
@@ -131,12 +131,15 @@ func (app *application) loginUser(w http.ResponseWriter, r *http.Request) {
 	// Close the response body on the return.
 	defer resp.Body.Close()
 
+	// If the credentials are not valid, add a generic error message to the
+	// form failures map and re-display the login page.
 	if resp.StatusCode != http.StatusOK {
 		form.Errors.Add("generic", "Email or Password is incorrect")
 		app.render(w, r, "login.page.tmpl", &templateData{Form: form})
 		return
 	}
 
+	// Extract user ID from the json web token
 	var tkn struct {
 		Token string `json:"token"`
 	}
@@ -154,11 +157,12 @@ func (app *application) loginUser(w http.ResponseWriter, r *http.Request) {
 		app.serverError(w, err)
 		return
 	}
+
 	// Add the ID of the current user to the session data (user loged in)
 	app.session.Put(r, "authenticatedUserID", claims.Subject)
 	app.session.Put(r, "jsonWebToken", tkn.Token)
 
-	// pop the captured path from the session data
+	// Pop the captured path from the session data
 	path := app.session.PopString(r, "redirectPathAfterLogin")
 	if path != "" {
 		http.Redirect(w, r, path, http.StatusSeeOther)
@@ -205,7 +209,7 @@ func (app *application) userProfile(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Decode json response into a product.
+	// Decode json response into a user.
 	var u user.User
 	if err := json.NewDecoder(resp.Body).Decode(&u); err != nil {
 		app.serverError(w, err)
