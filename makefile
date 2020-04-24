@@ -94,3 +94,7 @@ delete:
 
 ping:
 	curl -k -H "X-Probe: LivenessProbe" https://0.0.0.0:4200/ping; echo
+
+# inspect okteto secrets
+secrets:
+	kubectl get secrets/okteto-secrets -o json | jq -r .data[\"SEARCH_WEB_SESSION_SECRET\"] | base64 -d; echo
