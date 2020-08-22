@@ -1,4 +1,4 @@
-FROM golang:1.14.2-alpine3.11 as build_stage
+FROM golang:1.15-alpine3.12 as build_stage
 ENV CGO_ENABLED 0
 ARG VCS_REF
 ARG PACKAGE_NAME
@@ -24,18 +24,18 @@ RUN go build -ldflags "-X main.build=${VCS_REF}"
 # See https://golang.org/cmd/link/ for supported linker flags
 
 
-# Build production image with Go binaries based on Alpine.
-FROM alpine:3.11
+# Build production image with Go binary, ui and tls.
+FROM alpine:3.12
 ARG BUILD_DATE
 ARG VCS_REF
 ARG PACKAGE_NAME
 RUN addgroup -g 1000 -S app && adduser -u 1000 -S app -G app --no-create-home --disabled-password
 USER app
-COPY --from=build_stage --chown=app:app /app/cmd/${PACKAGE_NAME}/${PACKAGE_NAME} /app/main
+WORKDIR /app
+COPY --from=build_stage --chown=app:app /app/cmd/${PACKAGE_NAME}/${PACKAGE_NAME} /app/search
 COPY --from=build_stage --chown=app:app /app/ui /app/ui
 COPY --from=build_stage --chown=app:app /app/tls /app/tls
-WORKDIR /app
-CMD ["/app/main"]
+CMD ["/app/search"]
 
 LABEL org.opencontainers.image.created="${BUILD_DATE}" \
       org.opencontainers.image.title="${PACKAGE_NAME}" \
