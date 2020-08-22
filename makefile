@@ -1,4 +1,4 @@
-SHELL := /bin/bash
+SHELL = /bin/bash -o pipefail
 
 export PROJECT = tullo-starter-kit
 export REGISTRY_HOSTNAME = docker.io
@@ -8,6 +8,8 @@ export DOCKER_BUILDKIT = 1
 export SALES_URL = http://0.0.0.0:3000/v1
 export SESSION_SECRET := $(shell openssl rand -base64 32)
 
+.DEFAULT_GOAL := config
+
 all: search test-cover-profile test-cover-text
 
 go-run:
@@ -15,7 +17,7 @@ go-run:
 
 search:
 	docker build \
-		-f Dockerfile \
+		-f deploy/Dockerfile \
 		-t $(REGISTRY_HOSTNAME)/$(REGISTRY_ACCOUNT)/search-amd64:$(VERSION) \
 		--build-arg PACKAGE_NAME=search \
 		--build-arg VCS_REF=`git rev-parse HEAD` \
@@ -27,7 +29,7 @@ search:
 
 okteto-build:
 	okteto build \
-		-f Dockerfile \
+		-f deploy/Dockerfile \
 		-t registry.cloud.okteto.net/$(REGISTRY_ACCOUNT)/search-app-amd64:$(VERSION) \
 		--build-arg PACKAGE_NAME=search \
 		--build-arg VCS_REF=`git rev-parse HEAD` \
@@ -35,13 +37,13 @@ okteto-build:
 		.
 
 config:
-	docker-compose config
+	docker-compose -f deploy/docker-compose.yml config
 
 up:
-	docker-compose up --remove-orphans
+	docker-compose -f deploy/docker-compose.yml up --remove-orphans
 
 down:
-	docker-compose down
+	docker-compose -f deploy/docker-compose.yml down
 
 test:
 	go test -count=1 -failfast -test.timeout=30s ./...
@@ -75,16 +77,16 @@ deps-cleancache:
 	go clean -modcache
 
 dry-run:
-	kubectl apply --dry-run=client -f ./k8s/deploy-search-app.yaml -o yaml
+	kubectl apply --dry-run=client -f .deploy/k8s/deploy-search-app.yaml -o yaml
 
 deployment:
-	kubectl apply -f ./k8s/deploy-search-app.yaml
+	kubectl apply -f ./deploy/k8s/deploy-search-app.yaml
 	@echo
 	watch kubectl get pod,svc
 #	kubectl logs --tail=20 -f deployment/search-app --container search-app
 
 delete:
-	kubectl delete -f ./k8s/deploy-search-app.yaml
+	kubectl delete -f ./deploy/k8s/deploy-search-app.yaml
 	@echo
 	watch kubectl get pod,svc
 
