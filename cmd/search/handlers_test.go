@@ -10,6 +10,9 @@ import (
 )
 
 func TestPing(t *testing.T) {
+	if testing.Short() {
+		t.Log("skipping")
+	}
 
 	app := newTestApplication(t)
 	ts := newTestServer(t, app.routes())
@@ -26,6 +29,10 @@ func TestPing(t *testing.T) {
 }
 
 func TestLivenessProbe(t *testing.T) {
+	if testing.Short() {
+		t.Log("skipping")
+		return
+	}
 
 	app := newTestApplication(t)
 	ts := newTestServer(t, app.routes())
@@ -67,6 +74,10 @@ func TestAbout(t *testing.T) {
 }
 
 func TestLoginUser(t *testing.T) {
+	if testing.Short() {
+		t.Log("skipping")
+		return
+	}
 	app := newTestApplication(t)
 
 	ts := newTestServer(t, app.routes())
@@ -111,6 +122,10 @@ func TestLoginUser(t *testing.T) {
 }
 
 func TestUserProfile(t *testing.T) {
+	if testing.Short() {
+		t.Log("skipping")
+		return
+	}
 
 	app := newTestApplication(t)
 
@@ -159,6 +174,10 @@ func TestUserProfile(t *testing.T) {
 }
 
 func TestHomePage(t *testing.T) {
+	if testing.Short() {
+		t.Log("skipping")
+		return
+	}
 
 	app := newTestApplication(t)
 
@@ -208,6 +227,10 @@ func TestHomePage(t *testing.T) {
 }
 
 func TestShowProduct(t *testing.T) {
+	if testing.Short() {
+		t.Log("skipping")
+		return
+	}
 	app := newTestApplication(t)
 
 	ts := newTestServer(t, app.routes())
