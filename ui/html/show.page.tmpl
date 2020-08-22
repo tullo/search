@@ -1,6 +1,6 @@
 {{template "base" .}}
 
-{{define "title"}}Product {{shortID .Product.ID}}{{end}}
+{{define "title"}}Product {{.Product.Name}}{{end}}
 
 {{define "main"}}
     <h2>Product: {{.Product.Name}}</h2>
