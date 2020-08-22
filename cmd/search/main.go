@@ -67,7 +67,7 @@ func run() error {
 			Host            string        `conf:"default::4200"`
 			DebugMode       bool          `conf:"default:false"`
 			EnableTLS       bool          `conf:"default:false"`
-			SessionSecret   string        `conf:"default:M+ZrbJjvTLvXOvihe+Rjlr/ccfGjmFReGtLcV7gSufg="`
+			SessionSecret   string        `conf:"noprint,default:M+ZrbJjvTLvXOvihe+Rjlr/ccfGjmFReGtLcV7gSufg="`
 			IdleTimeout     time.Duration `conf:"default:1m"`
 			ReadTimeout     time.Duration `conf:"default:5s"`
 			WriteTimeout    time.Duration `conf:"default:5s"`
@@ -95,6 +95,10 @@ func run() error {
 			return nil
 		}
 		return errors.Wrap(err, "error: parsing config")
+	}
+
+	if len(cfg.Web.SessionSecret) == 0 {
+		return errors.New("session secret cannot be empty")
 	}
 
 	// =========================================================================
