@@ -62,6 +62,7 @@ func run() error {
 	// e.g. 'openssl rand -base64 32'
 
 	var cfg struct {
+		conf.Version
 		Web struct {
 			Host            string        `conf:"default::4200"`
 			DebugMode       bool          `conf:"default:false"`
@@ -81,6 +82,8 @@ func run() error {
 		}
 		Args conf.Args
 	}
+	cfg.Version.SVN = build
+	cfg.Version.Desc = "copyright information here"
 
 	if err := conf.Parse(os.Args[1:], "SEARCH", &cfg); err != nil {
 		if err == conf.ErrHelpWanted {
@@ -100,7 +103,14 @@ func run() error {
 	infoLog := log.New(os.Stdout, "INFO\t", log.Ldate|log.Ltime)
 	errorLog := log.New(os.Stderr, "ERROR\t", log.Ldate|log.Ltime|log.Lshortfile)
 
-	infoLog.Println("main : Started : Initializing web application")
+	infoLog.Printf("main: Started : Application initializing : version %q", build)
+	defer infoLog.Println("main: Completed")
+
+	out, err := conf.String(&cfg)
+	if err != nil {
+		return errors.Wrap(err, "generating config for output")
+	}
+	infoLog.Printf("main: Config :\n%v\n", out)
 
 	// initialize template cache
 	templateCache, err := newTemplateCache("./ui/html/")
