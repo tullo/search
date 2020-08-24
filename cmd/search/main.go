@@ -15,6 +15,7 @@ import (
 	"github.com/ardanlabs/conf"
 	"github.com/golangcollege/sessions"
 	"github.com/pkg/errors"
+	"github.com/tullo/search/tracer"
 )
 
 // build is the git version of this application. It is set using build flags in the makefile.
@@ -79,6 +80,11 @@ func run() error {
 			ReadTimeout     time.Duration `conf:"default:5s"`
 			WriteTimeout    time.Duration `conf:"default:5s"`
 			ShutdownTimeout time.Duration `conf:"default:5s"`
+		}
+		Zipkin struct {
+			ReporterURI string  `conf:"default:http://zipkin:9411/api/v2/spans"`
+			ServiceName string  `conf:"default:search"`
+			Probability float64 `conf:"default:0.05"`
 		}
 		Args conf.Args
 	}
@@ -161,6 +167,15 @@ func run() error {
 		IdleTimeout:  cfg.Web.IdleTimeout,
 		ReadTimeout:  cfg.Web.ReadTimeout,
 		WriteTimeout: cfg.Web.WriteTimeout,
+	}
+
+	// =========================================================================
+	// Start Tracing Support
+
+	log.Println("main: Initializing zipkin tracing support")
+
+	if err := tracer.Init(cfg.Zipkin.ServiceName, cfg.Zipkin.ReporterURI, cfg.Zipkin.Probability, errorLog); err != nil {
+		return errors.Wrap(err, "starting tracer")
 	}
 
 	// Make a channel to listen for errors coming from the listener. Use a

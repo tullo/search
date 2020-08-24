@@ -10,17 +10,44 @@ github.com/dgrijalva/jwt-go
 # github.com/golangcollege/sessions v1.2.0
 ## explicit
 github.com/golangcollege/sessions
-# github.com/google/go-cmp v0.4.0
-## explicit
 # github.com/justinas/alice v1.2.0
 ## explicit
 github.com/justinas/alice
 # github.com/justinas/nosurf v1.1.0
 ## explicit
 github.com/justinas/nosurf
+# github.com/openzipkin/zipkin-go v0.2.2
+github.com/openzipkin/zipkin-go/model
 # github.com/pkg/errors v0.9.1
 ## explicit
 github.com/pkg/errors
+# go.opentelemetry.io/otel v0.10.0
+## explicit
+go.opentelemetry.io/otel/api/correlation
+go.opentelemetry.io/otel/api/global
+go.opentelemetry.io/otel/api/global/internal
+go.opentelemetry.io/otel/api/internal
+go.opentelemetry.io/otel/api/kv
+go.opentelemetry.io/otel/api/label
+go.opentelemetry.io/otel/api/metric
+go.opentelemetry.io/otel/api/metric/registry
+go.opentelemetry.io/otel/api/oterror
+go.opentelemetry.io/otel/api/propagation
+go.opentelemetry.io/otel/api/trace
+go.opentelemetry.io/otel/api/unit
+go.opentelemetry.io/otel/internal/trace/parent
+# go.opentelemetry.io/otel/exporters/trace/zipkin v0.10.0
+## explicit
+go.opentelemetry.io/otel/exporters/trace/zipkin
+# go.opentelemetry.io/otel/sdk v0.10.0
+## explicit
+go.opentelemetry.io/otel/sdk
+go.opentelemetry.io/otel/sdk/export/trace
+go.opentelemetry.io/otel/sdk/instrumentation
+go.opentelemetry.io/otel/sdk/internal
+go.opentelemetry.io/otel/sdk/resource
+go.opentelemetry.io/otel/sdk/trace
+go.opentelemetry.io/otel/sdk/trace/internal
 # golang.org/x/crypto v0.0.0-20200820211705-5c72a883971a
 ## explicit
 golang.org/x/crypto/internal/subtle
@@ -30,3 +57,6 @@ golang.org/x/crypto/salsa20/salsa
 # golang.org/x/sys v0.0.0-20200821140526-fda516888d29
 ## explicit
 golang.org/x/sys/cpu
+# google.golang.org/grpc v1.30.0
+## explicit
+google.golang.org/grpc/codes

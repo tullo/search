@@ -95,9 +95,9 @@ func TestLoginUser(t *testing.T) {
 		wantBody     []byte
 	}{
 		{"Valid Submission", "user@example.com", "gophers", csrfToken, http.StatusSeeOther, nil},
-		{"Empty Email", "", "validPa$$word", csrfToken, http.StatusOK, []byte("Email or Password is incorrect")},
-		{"Empty Password", "user@example.com", "", csrfToken, http.StatusOK, []byte("Email or Password is incorrect")},
-		{"Invalid Password", "user@example.com", "FooBarBaz", csrfToken, http.StatusOK, []byte("Email or Password is incorrect")},
+		{"Empty Email", "", "validPa$$word", csrfToken, http.StatusSeeOther, []byte("Email or Password is incorrect")},
+		{"Empty Password", "user@example.com", "", csrfToken, http.StatusSeeOther, []byte("Email or Password is incorrect")},
+		{"Invalid Password", "user@example.com", "FooBarBaz", csrfToken, http.StatusSeeOther, []byte("Email or Password is incorrect")},
 		{"Invalid CSRF Token", "", "", "wrongToken", http.StatusBadRequest, nil},
 	}
 

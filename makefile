@@ -13,7 +13,10 @@ export SESSION_SECRET := $(shell openssl rand -base64 32)
 all: search test-cover-profile test-cover-text
 
 go-run:
-	go run ./cmd/search --web-enable-tls=true
+	go run ./cmd/search \
+		--web-debug-mode=true \
+		--web-enable-tls=true \
+		--zipkin-reporter-uri=http://0.0.0.0:9411/api/v2/spans
 
 search:
 	docker build \
