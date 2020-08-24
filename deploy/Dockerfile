@@ -7,15 +7,8 @@ ARG PACKAGE_NAME
 RUN mkdir -p /app
 WORKDIR /app
 
-# Copy the module files
-COPY go.* ./
-
-# Copy the source code into the image.
-COPY cmd cmd
-COPY internal internal
-COPY tls tls
-COPY ui ui
-COPY vendor vendor
+# Copy all files not filtered out via .dockerignore
+COPY . .
 
 # Build the search binary.
 WORKDIR /app/cmd/${PACKAGE_NAME}
