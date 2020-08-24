@@ -6,9 +6,11 @@ import (
 	"fmt"
 	"html/template"
 	"log"
+	"net"
 	"net/http"
 	"os"
 	"os/signal"
+	"strings"
 	"syscall"
 	"time"
 
@@ -184,10 +186,20 @@ func run() error {
 
 	// Start the application listening for requests.
 	go func() {
-		infoLog.Printf("Starting server on %s", cfg.Web.Host)
-		if app.useTLS {
-			serverErrors <- srv.ListenAndServeTLS("./tls/localhost/cert.pem", "./tls/localhost/key.pem")
+		var b strings.Builder
+		if cfg.Web.Host[:1] == ":" {
+			fmt.Fprintf(&b, "%s%s/", getOutboundIP(), cfg.Web.Host)
+		} else {
+			fmt.Fprintf(&b, "%s/", cfg.Web.Host)
 		}
+
+		if app.useTLS {
+			infoLog.Printf("Starting server @ https://%s", b.String())
+			serverErrors <- srv.ListenAndServeTLS("./tls/localhost/cert.pem", "./tls/localhost/key.pem")
+			return
+		}
+
+		infoLog.Printf("Starting server @ http://%s", b.String())
 		serverErrors <- srv.ListenAndServe()
 	}()
 
@@ -223,4 +235,17 @@ func run() error {
 	}
 
 	return nil
+}
+
+// Get the preferred outbound IP address of this machine.
+func getOutboundIP() net.IP {
+	conn, err := net.Dial("udp", "1.1.1.1:80")
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer conn.Close()
+
+	localAddr := conn.LocalAddr().(*net.UDPAddr)
+
+	return localAddr.IP
 }
