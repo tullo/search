@@ -1,16 +1,18 @@
+#!make
 SHELL = /bin/bash -o pipefail
 
-export PROJECT = tullo-starter-kit
-export REGISTRY_HOSTNAME = docker.io
-export REGISTRY_ACCOUNT = tullo
 export VERSION = 0.1.0
-export DOCKER_BUILDKIT = 1
-export SALES_URL = http://0.0.0.0:3000/v1
+PROJECT = stackwise-starter-kit
+REGISTRY_HOSTNAME = docker.io
+export REGISTRY_ACCOUNT = tullo
+CONTAINER_REGISTRY = eu.gcr.io
+DOCKER_BUILDKIT = 1
+SALES_URL = http://0.0.0.0:3000/v1
 export SESSION_SECRET := $(shell openssl rand -base64 32)
 
 .DEFAULT_GOAL := config
 
-all: search test-cover-profile test-cover-text
+all: docker-build-search test-cover-profile test-cover-text
 
 go-run:
 	go run ./cmd/search \
@@ -18,25 +20,31 @@ go-run:
 		--web-enable-tls=true \
 		--zipkin-reporter-uri=http://0.0.0.0:9411/api/v2/spans
 
-search:
+docker-build-search:
 	docker build \
 		-f deploy/Dockerfile \
 		-t $(REGISTRY_HOSTNAME)/$(REGISTRY_ACCOUNT)/search-amd64:$(VERSION) \
-		--build-arg PACKAGE_NAME=search \
 		--build-arg VCS_REF=`git rev-parse HEAD` \
-		--build-arg BUILD_DATE=`date -u +”%Y-%m-%dT%H:%M:%SZ”` \
+		--build-arg BUILD_DATE=`date -u +"%Y-%m-%dT%H:%M:%SZ"` \
 		.
+
+docker-tag-gcr-image:
+	set -e ; \
 	docker image tag \
-		$(REGISTRY_ACCOUNT)/search-amd64:$(VERSION) \
-		gcr.io/$(PROJECT)/search-amd64:$(VERSION)
+		$(REGISTRY_ACCOUNT)/search-amd64:$(VERSION) ${CONTAINER_REGISTRY}/$(PROJECT)/search-amd64:`git rev-parse HEAD`
+
+docker-push-gcr-image:
+	set -e ; \
+	docker image push ${CONTAINER_REGISTRY}/$(PROJECT)/search-amd64:`git rev-parse HEAD`
+	@echo '==>' listing tags for image: [$(CONTAINER_REGISTRY)/$(PROJECT)/search-amd64]:
+	@gcloud container images list-tags $(CONTAINER_REGISTRY)/$(PROJECT)/search-amd64
 
 okteto-build:
 	okteto build \
 		-f deploy/Dockerfile \
 		-t registry.cloud.okteto.net/$(REGISTRY_ACCOUNT)/search-app-amd64:$(VERSION) \
-		--build-arg PACKAGE_NAME=search \
 		--build-arg VCS_REF=`git rev-parse HEAD` \
-		--build-arg BUILD_DATE=`date -u +”%Y-%m-%dT%H:%M:%SZ”` \
+		--build-arg BUILD_DATE=`date -u +"%Y-%m-%dT%H:%M:%SZ"` \
 		.
 
 config:
@@ -85,7 +93,7 @@ deps-cleancache:
 	go clean -modcache
 
 dry-run:
-	kubectl apply --dry-run=client -f .deploy/k8s/deploy-search-app.yaml -o yaml
+	kubectl apply --dry-run=client -f ./deploy/k8s/deploy-search-app.yaml -o yaml
 
 deployment:
 	kubectl apply -f ./deploy/k8s/deploy-search-app.yaml
