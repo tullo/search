@@ -25,4 +25,4 @@ services:
 networks:
   outside:
     external:
-      name: service_shared-network
+      name: docker_shared-network
