@@ -29,7 +29,7 @@ jobs:
 
     - name: Run go vet & static checks
       run: |
-        go vet ./...
+        go vet ./cmd/*** ./internal/*** ./tracer/
         export PATH=$PATH:$(go env GOPATH)/bin
         GO111MODULE=off go get -u honnef.co/go/tools/cmd/staticcheck
         staticcheck -go 1.15 ./...
