@@ -54,11 +54,16 @@ test:
 test-cover-profile:
 	go test -test.timeout=30s -coverprofile=/tmp/profile.out ./...
 
+# Display coverage percentages to stdout
 test-cover-text:
 	go tool cover -func=/tmp/profile.out
 
+# 1. Writes out an HTML file instead of launching a web browser.
+# 2. Uses Firefox to display the annotated source code.
+# go tool cover -h
 test-cover-html:
-	go tool cover -html=/tmp/profile.out
+	go tool cover -html=/tmp/profile.out -o /tmp/coverage.html
+	firefox /tmp/coverage.html
 
 stop-all:
 	docker container stop $$(docker container ls -q --filter name=search)
