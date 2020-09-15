@@ -44,7 +44,6 @@ func TestLivenessProbe(t *testing.T) {
 		t.Errorf("creating request %s", err)
 	}
 
-	req.Header.Set("X-Probe", "LivenessProbe")
 	code, _, body := ts.clientDo(t, req)
 
 	if code != http.StatusOK {

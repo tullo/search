@@ -30,31 +30,31 @@ func (app *application) newGetRequest(ctx context.Context, r *http.Request, url 
 
 func (app *application) ping(w http.ResponseWriter, r *http.Request) {
 
-	if "LivenessProbe" == r.Header.Get("X-Probe") {
+	ctx, cancel := context.WithTimeout(r.Context(), time.Second)
+	defer cancel()
 
-		ctx, cancel := context.WithTimeout(r.Context(), time.Second)
-		defer cancel()
+	url := fmt.Sprintf("%s/liveness", app.salesURL)
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
+	if err != nil {
+		w.Write([]byte(fmt.Sprintf("%v", err)))
+		return
+	}
 
-		url := fmt.Sprintf("%s/health", app.salesURL)
-		req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
-		if err != nil {
-			w.Write([]byte(fmt.Sprintf("%v", err)))
-			return
-		}
+	// custom header used to get around okteto related issue
+	req.Header.Set("X-Probe", "LivenessProbe")
 
-		// Do will handle the context level timeout.
-		resp, err := http.DefaultClient.Do(req)
-		if err != nil {
-			w.Write([]byte(fmt.Sprintf("%v", err)))
-			return
-		}
-		defer resp.Body.Close()
+	// Do will handle the context level timeout.
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		w.Write([]byte(fmt.Sprintf("%v", err)))
+		return
+	}
+	defer resp.Body.Close()
 
-		if resp.StatusCode != http.StatusOK {
-			msg := fmt.Sprintf("received unexpected response status: %d", resp.StatusCode)
-			w.Write([]byte(msg))
-			return
-		}
+	if resp.StatusCode != http.StatusOK {
+		msg := fmt.Sprintf("received unexpected response status: %d", resp.StatusCode)
+		w.Write([]byte(msg))
+		return
 	}
 
 	w.Write([]byte("OK"))
