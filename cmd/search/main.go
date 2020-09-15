@@ -38,9 +38,6 @@ type application struct {
 	shutdown      chan os.Signal
 	templateCache map[string]*template.Template
 	useTLS        bool
-	users         interface {
-		Authenticate(string, string) (string, error)
-	}
 }
 
 // SignalShutdown is used to gracefully shutdown the app when an integrity

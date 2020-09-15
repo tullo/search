@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"html"
 	"io/ioutil"
 	"log"
@@ -152,6 +151,7 @@ func (ts *testServer) clientDo(t *testing.T, r *http.Request) (int, http.Header,
 	return rs.StatusCode, rs.Header, body
 }
 
+/*
 func (ts *testServer) getCheckRedirect(t *testing.T, urlPath string, s *sessions.Session) (int, http.Header, []byte) {
 	client := ts.Client()
 	client.CheckRedirect = func(req *http.Request, via []*http.Request) error {
@@ -181,3 +181,4 @@ func (ts *testServer) getCheckRedirect(t *testing.T, urlPath string, s *sessions
 
 	return rs.StatusCode, rs.Header, body
 }
+*/

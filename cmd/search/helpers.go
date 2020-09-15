@@ -81,10 +81,6 @@ func (app *application) clientError(w http.ResponseWriter, status int) {
 	http.Error(w, http.StatusText(status), status)
 }
 
-func (app *application) notFound(w http.ResponseWriter) {
-	app.clientError(w, http.StatusNotFound)
-}
-
 func (app *application) addDefaultData(td *templateData, r *http.Request) *templateData {
 	if td == nil {
 		td = &templateData{}
@@ -118,7 +114,7 @@ func (app *application) isAuthenticated(r *http.Request) bool {
 func (app *application) render(w http.ResponseWriter, r *http.Request, name string, data *templateData) {
 	ts, ok := app.templateCache[name]
 	if !ok {
-		app.serverError(w, fmt.Errorf("The template %s does not exist", name))
+		app.serverError(w, fmt.Errorf("the template %s does not exist", name))
 		return
 	}
 

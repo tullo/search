@@ -12,6 +12,7 @@ import (
 func TestPing(t *testing.T) {
 	if testing.Short() {
 		t.Log("skipping")
+		return
 	}
 
 	app := newTestApplication(t)
