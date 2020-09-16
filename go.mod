@@ -10,10 +10,9 @@ require (
 	github.com/justinas/alice v1.2.0
 	github.com/justinas/nosurf v1.1.0
 	github.com/pkg/errors v0.9.1
-	go.opentelemetry.io/otel v0.10.0
-	go.opentelemetry.io/otel/exporters/trace/zipkin v0.10.0
-	go.opentelemetry.io/otel/sdk v0.10.0
+	go.opentelemetry.io/otel v0.11.0
+	go.opentelemetry.io/otel/exporters/trace/zipkin v0.11.0
+	go.opentelemetry.io/otel/sdk v0.11.0
 	golang.org/x/crypto v0.0.0-20200820211705-5c72a883971a // indirect
 	golang.org/x/sys v0.0.0-20200821140526-fda516888d29 // indirect
-	google.golang.org/grpc v1.30.0
 )
