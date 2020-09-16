@@ -125,8 +125,11 @@ kctl-secret-get:
 kctl-secret-create:
 	kubectl create secret generic search-app --from-literal=session_secret=${SESSION_SECRET}
 
-port-forward:
+kctl-port-forward-app:
 	set -e ; \
 	POD=$$(kubectl get pod --selector="app=search-app" --output jsonpath='{.items[0].metadata.name}') ; \
 	echo "===> kubectl port-forward $${POD} 8080:8080" ; \
 	kubectl port-forward $${POD} 8080:8080
+
+kctl-port-forward-argocd:
+	@kubectl port-forward svc/argocd-server -n argocd 8080:443
