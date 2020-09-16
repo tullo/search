@@ -13,10 +13,11 @@ github.com/golangcollege/sessions
 # github.com/justinas/alice v1.2.0
 ## explicit
 github.com/justinas/alice
-# github.com/justinas/nosurf v1.1.0
+# github.com/justinas/nosurf v1.1.1
 ## explicit
 github.com/justinas/nosurf
-# github.com/openzipkin/zipkin-go v0.2.3
+# github.com/openzipkin/zipkin-go v0.2.4
+## explicit
 github.com/openzipkin/zipkin-go/model
 # github.com/pkg/errors v0.9.1
 ## explicit
@@ -54,8 +55,9 @@ golang.org/x/crypto/internal/subtle
 golang.org/x/crypto/nacl/secretbox
 golang.org/x/crypto/poly1305
 golang.org/x/crypto/salsa20/salsa
-# golang.org/x/sys v0.0.0-20200821140526-fda516888d29
+# golang.org/x/sys v0.0.0-20200916084744-dbad9cb7cb7a
 ## explicit
 golang.org/x/sys/cpu
-# google.golang.org/grpc v1.31.0
+# google.golang.org/grpc v1.32.0
+## explicit
 google.golang.org/grpc/codes
