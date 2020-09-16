@@ -62,8 +62,7 @@ func newTestApplication(t *testing.T) *application {
 	// app struct instantiation using the mocks for the loggers and database models
 	app := application{
 		debug:         true,
-		errorLog:      log.New(ioutil.Discard, "", 0),
-		infoLog:       log.New(ioutil.Discard, "", 0),
+		log:           log.New(ioutil.Discard, "", 0),
 		templateCache: templateCache,
 		salesURL:      baseURL,
 		session:       session,
