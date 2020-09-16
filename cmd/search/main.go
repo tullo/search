@@ -31,8 +31,7 @@ const contextKeyIsAuthenticated = contextKey("isAuthenticated")
 // define the interfaces inline to keep the code simple
 type application struct {
 	debug         bool
-	errorLog      *log.Logger
-	infoLog       *log.Logger
+	log           *log.Logger
 	salesURL      string
 	session       *sessions.Session
 	shutdown      chan os.Signal
@@ -47,13 +46,15 @@ func (a *application) SignalShutdown() {
 }
 
 func main() {
-	if err := run(); err != nil {
+	log := log.New(os.Stdout, "SEARCH : ", log.LstdFlags|log.Lmicroseconds|log.Lshortfile)
+
+	if err := run(log); err != nil {
 		log.Printf("error: %s", err)
 		os.Exit(1)
 	}
 }
 
-func run() error {
+func run(log *log.Logger) error {
 
 	// =========================================================================
 	// Configuration
@@ -109,22 +110,19 @@ func run() error {
 	// =========================================================================
 	// Start Web Application
 
-	infoLog := log.New(os.Stdout, "INFO\t", log.Ldate|log.Ltime)
-	errorLog := log.New(os.Stderr, "ERROR\t", log.Ldate|log.Ltime|log.Lshortfile)
-
-	infoLog.Printf("main: Started : Application initializing : version %q", build)
-	defer infoLog.Println("main: Completed")
+	log.Printf("main: Started : Application initializing : version %q", build)
+	defer log.Println("main: Completed")
 
 	out, err := conf.String(&cfg)
 	if err != nil {
 		return errors.Wrap(err, "generating config for output")
 	}
-	infoLog.Printf("main: Config :\n%v\n", out)
+	log.Printf("main: Config :\n%v\n", out)
 
 	// initialize template cache
 	templateCache, err := newTemplateCache("./ui/html/")
 	if err != nil {
-		errorLog.Fatal(err)
+		log.Fatal(err)
 	}
 
 	// sessions expire after 12 hours
@@ -142,8 +140,7 @@ func run() error {
 
 	app := &application{
 		debug:         cfg.Web.DebugMode,
-		errorLog:      errorLog,
-		infoLog:       infoLog,
+		log:           log,
 		salesURL:      cfg.Sales.BaseURL,
 		session:       session,
 		shutdown:      shutdown,
@@ -160,7 +157,6 @@ func run() error {
 
 	srv := &http.Server{
 		Addr:         cfg.Web.Host,
-		ErrorLog:     errorLog,
 		Handler:      app.routes(),
 		TLSConfig:    tlsConfig,
 		IdleTimeout:  cfg.Web.IdleTimeout,
@@ -173,7 +169,7 @@ func run() error {
 
 	log.Println("main: Initializing zipkin tracing support")
 
-	if err := tracer.Init(cfg.Zipkin.ServiceName, cfg.Zipkin.ReporterURI, cfg.Zipkin.Probability, errorLog); err != nil {
+	if err := tracer.Init(cfg.Zipkin.ServiceName, cfg.Zipkin.ReporterURI, cfg.Zipkin.Probability, log); err != nil {
 		return errors.Wrap(err, "starting tracer")
 	}
 
@@ -191,12 +187,12 @@ func run() error {
 		}
 
 		if app.useTLS {
-			infoLog.Printf("Starting server @ https://%s", b.String())
+			log.Printf("Starting server @ https://%s", b.String())
 			serverErrors <- srv.ListenAndServeTLS("./tls/localhost/cert.pem", "./tls/localhost/key.pem")
 			return
 		}
 
-		infoLog.Printf("Starting server @ http://%s", b.String())
+		log.Printf("Starting server @ http://%s", b.String())
 		serverErrors <- srv.ListenAndServe()
 	}()
 
@@ -209,7 +205,7 @@ func run() error {
 		return errors.Wrap(err, "server error")
 
 	case sig := <-shutdown:
-		infoLog.Printf("main : %v : Start shutdown", sig)
+		log.Printf("main : %v : Start shutdown", sig)
 
 		// Give outstanding requests a deadline for completion.
 		ctx, cancel := context.WithTimeout(context.Background(), cfg.Web.ShutdownTimeout)
@@ -218,7 +214,7 @@ func run() error {
 		// Trigger graceful shutdown of the server, listeners.
 		err := srv.Shutdown(ctx)
 		if err != nil {
-			infoLog.Printf("main : Graceful shutdown did not complete in %v : %v", cfg.Web.ShutdownTimeout, err)
+			log.Printf("main : Graceful shutdown did not complete in %v : %v", cfg.Web.ShutdownTimeout, err)
 			err = srv.Close()
 		}
 

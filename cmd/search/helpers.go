@@ -63,7 +63,7 @@ func (app *application) ping(w http.ResponseWriter, r *http.Request) {
 func (app *application) serverError(w http.ResponseWriter, err error) {
 	trace := fmt.Sprintf("%s\n%s", err.Error(), debug.Stack())
 	// go one step back in the stack trace to get the file name and line number
-	app.errorLog.Output(2, trace)
+	app.log.Output(2, trace)
 
 	// when running in debug mode,
 	// write detailed errors and stack traces to the http response
