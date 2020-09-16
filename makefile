@@ -12,7 +12,7 @@ export SESSION_SECRET := $(shell openssl rand -base64 32)
 
 .DEFAULT_GOAL := config
 
-all: docker-build-search test-cover-profile test-cover-text
+all: docker-build-search go-test-cover-profile go-test-cover-text
 
 go-run:
 	go run ./cmd/search \
@@ -23,7 +23,7 @@ go-run:
 docker-build-search:
 	docker build \
 		-f deploy/Dockerfile \
-		-t $(REGISTRY_HOSTNAME)/$(REGISTRY_ACCOUNT)/search-amd64:$(VERSION) \
+		-t $(REGISTRY_HOSTNAME)/$(REGISTRY_ACCOUNT)/search-app-amd64:$(VERSION) \
 		--build-arg VCS_REF=`git rev-parse HEAD` \
 		--build-arg BUILD_DATE=`date -u +"%Y-%m-%dT%H:%M:%SZ"` \
 		.
@@ -31,13 +31,13 @@ docker-build-search:
 docker-tag-gcr-image:
 	set -e ; \
 	docker image tag \
-		$(REGISTRY_ACCOUNT)/search-amd64:$(VERSION) ${CONTAINER_REGISTRY}/$(PROJECT)/search-amd64:`git rev-parse HEAD`
+		$(REGISTRY_ACCOUNT)/search-app-amd64:$(VERSION) ${CONTAINER_REGISTRY}/$(PROJECT)/search-app-amd64:`git rev-parse HEAD`
 
 docker-push-gcr-image:
 	set -e ; \
-	docker image push ${CONTAINER_REGISTRY}/$(PROJECT)/search-amd64:`git rev-parse HEAD`
-	@echo '==>' listing tags for image: [$(CONTAINER_REGISTRY)/$(PROJECT)/search-amd64]:
-	@gcloud container images list-tags $(CONTAINER_REGISTRY)/$(PROJECT)/search-amd64
+	docker image push ${CONTAINER_REGISTRY}/$(PROJECT)/search-app-amd64:`git rev-parse HEAD`
+	@echo '==>' listing tags for image: [$(CONTAINER_REGISTRY)/$(PROJECT)/search-app-amd64]:
+	@gcloud container images list-tags $(CONTAINER_REGISTRY)/$(PROJECT)/search-app-amd64
 
 okteto-build:
 	okteto build \
@@ -56,20 +56,20 @@ up:
 down:
 	docker-compose -f deploy/docker-compose.yml down
 
-test:
+go-test:
 	go test -count=1 -failfast -test.timeout=30s ./...
 
-test-cover-profile:
+go-test-cover-profile:
 	go test -test.timeout=30s -coverprofile=/tmp/profile.out ./...
 
 # Display coverage percentages to stdout
-test-cover-text:
+go-test-cover-text:
 	go tool cover -func=/tmp/profile.out
 
 # 1. Writes out an HTML file instead of launching a web browser.
 # 2. Uses Firefox to display the annotated source code.
 # go tool cover -h
-test-cover-html:
+go-test-cover-html:
 	go tool cover -html=/tmp/profile.out -o /tmp/coverage.html
 	firefox /tmp/coverage.html
 
@@ -79,40 +79,54 @@ stop-all:
 remove-all:
 	docker container rm $$(docker container ls -aq --filter "name=search")
 
-tidy:
+go-tidy:
 	go mod tidy
 	go mod vendor
 
-deps-upgrade:
+go-deps-upgrade:
 	go get -d -t -u -v ./...
 #   -d flag ...download the source code needed to build ...
 #   -t flag ...consider modules needed to build tests ...
 #   -u flag ...use newer minor or patch releases when available 
 
-deps-cleancache:
+go-deps-cleancache:
 	go clean -modcache
 
-dry-run:
-	kubectl apply --dry-run=client -f ./deploy/k8s/deploy-search-app.yaml -o yaml
+kctl-dry-run:
+	kubectl apply --dry-run=server -f ./deploy/k8s/gcp/deploy-search-app.yaml -o yaml --validate=true
 
-deployment:
-	kubectl apply -f ./deploy/k8s/deploy-search-app.yaml
+kctl-deployment:
+	kubectl apply -f ./deploy/k8s/gcp/deploy-search-app.yaml
+	@echo
+	@kubectl rollout status deployment/search-app --watch=true
+	@echo
+	@kubectl get pod,svc
+
+kctl-delete:
+	@kubectl delete -f ./deploy/k8s/gcp/deploy-search-app.yaml
 	@echo
 	watch kubectl get pod,svc
-#	kubectl logs --tail=20 -f deployment/search-app --container search-app
 
-delete:
-	kubectl delete -f ./deploy/k8s/deploy-search-app.yaml
-	@echo
-	watch kubectl get pod,svc
+kctl-logs:
+	@kubectl logs --tail=20 -f deployment/search-app --container search-app
 
-#rollout:
-#	kubectl rollout restart deployment/search-app
-#	kubectl exec -it pod/search-app-644654fddb-nsl9h -- env
+kctl-rollout:
+	@kubectl rollout status deployment/search-app
+#	@kubectl rollout restart deployment/search-app
+#	@kubectl exec -it pod/search-app-644654fddb-nsl9h -- env
 
 ping:
 	curl -k -H "X-Probe: LivenessProbe" https://0.0.0.0:4200/ping; echo
 
-# inspect okteto secrets
-secrets:
-	kubectl get secrets/okteto-secrets -o json | jq -r .data[\"SEARCH_WEB_SESSION_SECRET\"] | base64 -d; echo
+kctl-secret-get:
+	kubectl get secrets/search-app -o json
+#	kubectl get secrets/okteto-secrets -o json | jq -r .data[\"SEARCH_WEB_SESSION_SECRET\"] | base64 -d; echo
+
+kctl-secret-create:
+	kubectl create secret generic search-app --from-literal=session_secret=${SESSION_SECRET}
+
+port-forward:
+	set -e ; \
+	POD=$$(kubectl get pod --selector="app=search-app" --output jsonpath='{.items[0].metadata.name}') ; \
+	echo "===> kubectl port-forward $${POD} 8080:8080" ; \
+	kubectl port-forward $${POD} 8080:8080
