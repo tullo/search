@@ -7,12 +7,12 @@ spec:
   revisionHistoryLimit: 2
   selector:
     matchLabels:
-      service: search-app
+      app: search-app
   template:
     metadata:
       name: search-app
       labels:
-        service: search-app
+        app: search-app
     spec:
       securityContext:
         runAsUser: 1000
@@ -20,20 +20,27 @@ spec:
         fsGroup: 1000
       containers:
       - name: search-app
-        image: registry.cloud.okteto.net/tullo/search-app-amd64:0.1.0
+        image: eu.gcr.io/stackwise-starter-kit/search-app-amd64:f4091cfe0fcf6383562bc9db2a3a4cdbe22f26ae
         env:
         - name: SEARCH_WEB_HOST
           value: :8080
+        - name: SEARCH_WEB_ENABLE_TLS
+          value: 'true'
         - name: SEARCH_WEB_SESSION_SECRET
-          value: injected_by_okteto_cloud
+          valueFrom:
+            secretKeyRef:
+              name: search-app
+              key: session_secret
         - name: SEARCH_SALES_BASE_URL
-          value: http://sales-api:8080/v1
+          value: http://sales-api:3000/v1
         - name: SEARCH_SALES_IDLE_TIMEOUT
           value: 1m
         - name: SEARCH_SALES_READ_TIMEOUT
           value: 5s
         - name: SEARCH_SALES_WRITE_TIMEOUT
           value: 5s
+        - name: SEARCH_ZIPKIN_REPORTER_URI
+          value: http://sales-api:9411/api/v2/spans
         - name: AIT_NODE_NAME
           valueFrom:
             fieldRef:
@@ -67,39 +74,16 @@ spec:
           limits:
             cpu: 100m
             memory: 128Mi
-        livenessProbe:
-          httpGet:
-            path: /ping
-            port: http
-            httpHeaders:
-              - name: X-Probe
-                value: LivenessProbe
-          initialDelaySeconds: 5
-          periodSeconds: 45
-          timeoutSeconds: 10
-          failureThreshold: 5
-          successThreshold: 1
-        readinessProbe:
-          httpGet:
-            path: /ping
-            port: http
-          initialDelaySeconds: 20
-          periodSeconds: 10
-          timeoutSeconds: 2
-          failureThreshold: 5
-          successThreshold: 1
 ---
 apiVersion: v1
 kind: Service
 metadata:
   name: search-app
-  annotations:
-    dev.okteto.com/auto-ingress: "true"
 spec:
+  selector:
+    app: search-app
   type: ClusterIP
   ports:
   - name: "search-app"
     port: 8080
     targetPort: 8080
-  selector:
-    service: search-app
