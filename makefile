@@ -30,11 +30,16 @@ docker-build-search:
 		--build-arg VCS_REF=`git rev-parse HEAD` \
 		--build-arg BUILD_DATE=`date -u +"%Y-%m-%dT%H:%M:%SZ"` \
 		.
+	@echo Inspecting image revision:
+	@docker image inspect tullo/search-app-amd64:0.1.0 --format='{{json .Config.Labels}}' | jq '.["org.opencontainers.image.revision"]'
 
 docker-tag-gcr-image:
 	set -e ; \
 	docker image tag \
 		$(REGISTRY_ACCOUNT)/search-app-amd64:$(VERSION) ${CONTAINER_REGISTRY}/$(PROJECT)/search-app-amd64:`git rev-parse HEAD`
+	@echo Inspecting image revision:
+	@docker image inspect ${CONTAINER_REGISTRY}/$(PROJECT)/search-app-amd64:`git rev-parse HEAD` \
+	--format='{{json .Config.Labels}}' | jq '.["org.opencontainers.image.revision"]'
 
 docker-push-gcr-image:
 	set -e ; \
