@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"crypto/tls"
+	"encoding/base64"
 	"fmt"
 	"html/template"
 	"log"
@@ -59,7 +60,7 @@ func run(log *log.Logger) error {
 	// =========================================================================
 	// Configuration
 
-	// session secret (should be 32 bytes long) is used to encrypt and authenticate session cookies
+	// session secret (must be 32 bytes long) is used to encrypt and authenticate session cookies
 	// e.g. 'openssl rand -base64 32'
 
 	var cfg struct {
@@ -68,7 +69,7 @@ func run(log *log.Logger) error {
 			Host            string        `conf:"default::4200"`
 			DebugMode       bool          `conf:"default:false"`
 			EnableTLS       bool          `conf:"default:false"`
-			SessionSecret   string        `conf:"noprint,default:M+ZrbJjvTLvXOvihe+Rjlr/ccfGjmFReGtLcV7gSufg="`
+			SessionSecret   string        `conf:"noprint"`
 			IdleTimeout     time.Duration `conf:"default:1m"`
 			ReadTimeout     time.Duration `conf:"default:5s"`
 			WriteTimeout    time.Duration `conf:"default:5s"`
@@ -103,26 +104,29 @@ func run(log *log.Logger) error {
 		return errors.Wrap(err, "error: parsing config")
 	}
 
-	if len(cfg.Web.SessionSecret) == 0 {
-		return errors.New("session secret cannot be empty")
-	}
-
 	// =========================================================================
 	// Start Web Application
 
-	log.Printf("main: Started : Application initializing : version %q", build)
-	defer log.Println("main: Completed")
+	log.Printf("Initializing Application: version %q\n", build)
 
 	out, err := conf.String(&cfg)
 	if err != nil {
 		return errors.Wrap(err, "generating config for output")
 	}
-	log.Printf("main: Config :\n%v\n", out)
+	log.Printf("Config :\n%v\n", out)
 
 	// initialize template cache
 	templateCache, err := newTemplateCache("./ui/html/")
 	if err != nil {
 		log.Fatal(err)
+	}
+
+	decoded, err := base64.StdEncoding.DecodeString(cfg.Web.SessionSecret)
+	if err != nil {
+		return errors.Wrap(err, "decoding session secret")
+	}
+	if len(decoded) != 32 {
+		return errors.New("session secret must be exactly 32 bytes long")
 	}
 
 	// sessions expire after 12 hours
@@ -167,7 +171,7 @@ func run(log *log.Logger) error {
 	// =========================================================================
 	// Start Tracing Support
 
-	log.Println("main: Initializing zipkin tracing support")
+	log.Println("Initializing zipkin tracing support")
 
 	if err := tracer.Init(cfg.Zipkin.ServiceName, cfg.Zipkin.ReporterURI, cfg.Zipkin.Probability, log); err != nil {
 		return errors.Wrap(err, "starting tracer")
@@ -214,7 +218,7 @@ func run(log *log.Logger) error {
 		// Trigger graceful shutdown of the server, listeners.
 		err := srv.Shutdown(ctx)
 		if err != nil {
-			log.Printf("main : Graceful shutdown did not complete in %v : %v", cfg.Web.ShutdownTimeout, err)
+			log.Printf("Graceful shutdown did not complete in %v : %v", cfg.Web.ShutdownTimeout, err)
 			err = srv.Close()
 		}
 
