@@ -2,8 +2,10 @@ version: '3'
 
 services:
   search:
+    cap_drop:
+      - ALL
     container_name: search
-    image: ${REGISTRY_ACCOUNT}/search-amd64:${VERSION}
+    image: ${REGISTRY_ACCOUNT}/search-app-amd64:${VERSION}
     networks:
       - outside
     ports:
