@@ -23,6 +23,7 @@ services:
       - SEARCH_SALES_READ_TIMEOUT=5s
       - SEARCH_SALES_WRITE_TIMEOUT=5s
       - SEARCH_SALES_SHUTDOWN_TIMEOUT=5s
+    user: "100000"
 
 networks:
   outside:

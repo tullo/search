@@ -20,8 +20,8 @@ RUN go build -ldflags "-X main.build=${VCS_REF}"
 FROM alpine:3.12
 ARG BUILD_DATE
 ARG VCS_REF
-RUN addgroup -g 1000 -S app && adduser -u 1000 -S app -G app --no-create-home --disabled-password
-USER app
+RUN addgroup -g 3000 -S app && adduser -u 100000 -S app -G app --no-create-home --disabled-password
+USER 100000
 WORKDIR /app
 COPY --from=build_stage --chown=app:app /app/cmd/search/search /app/search
 COPY --from=build_stage --chown=app:app /app/ui /app/ui

@@ -15,6 +15,7 @@ spec:
         app: search-app
     spec:
       securityContext:
+        runAsNonRoot: true
         runAsUser: 1000
         runAsGroup: 1000
         fsGroup: 1000
@@ -78,7 +79,9 @@ spec:
           capabilities:
             drop:
               - all
+          runAsGroup: 3000
           runAsNonRoot: true
+          runAsUser: 100000
           readOnlyRootFilesystem: true
           allowPrivilegeEscalation: false
 ---
