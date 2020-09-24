@@ -15,9 +15,9 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/ardanlabs/conf"
 	"github.com/golangcollege/sessions"
 	"github.com/pkg/errors"
+	"github.com/tullo/conf"
 	"github.com/tullo/search/tracer"
 )
 
@@ -89,8 +89,8 @@ func run(log *log.Logger) error {
 		}
 		Args conf.Args
 	}
-	cfg.Version.SVN = build
-	cfg.Version.Desc = "copyright information here"
+	cfg.Version.Version = build
+	cfg.Version.Description = "copyright information here"
 
 	if err := conf.Parse(os.Args[1:], "SEARCH", &cfg); err != nil {
 		if err == conf.ErrHelpWanted {
