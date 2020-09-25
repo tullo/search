@@ -141,3 +141,19 @@ kctl-port-forward-app:
 
 kctl-port-forward-argocd:
 	@kubectl port-forward svc/argocd-server -n argocd 8080:443
+
+mkcert-install:
+	@echo make sure libnss3-tools is installed \"apt install libnss3-tools\"
+	set -e ; \
+	git clone https://github.com/FiloSottile/mkcert ; \
+	cd mkcert ; \
+	go install -v -ldflags "-X main.Version=$$(git describe --tags)" ; \
+	rm -fr ../mkcert
+	$(shell go env GOPATH)/bin/mkcert
+
+mkcert-install-rootCA:
+	$(shell go env GOPATH)/bin/mkcert -install
+
+mkcert-generate-certs:
+	$(shell go env GOPATH)/bin/mkcert -cert-file ./tls/localhost/cert.pem -key-file ./tls/localhost/key.pem \
+		search 0.0.0.0 localhost 127.0.0.1 ::1
