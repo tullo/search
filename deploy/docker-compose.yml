@@ -1,31 +1,32 @@
-version: '3'
+version: '3.8'
+
+networks:
+  outside:
+    external: true
+    name: docker_shared-network
 
 services:
   search:
     cap_drop:
-      - ALL
+    - ALL
     container_name: search
+    environment:
+      SEARCH_SALES_BASE_URL: http://sales-api:3000/v1
+      SEARCH_SALES_IDLE_TIMEOUT: 1m
+      SEARCH_SALES_READ_TIMEOUT: 5s
+      SEARCH_SALES_SHUTDOWN_TIMEOUT: 5s
+      SEARCH_SALES_WRITE_TIMEOUT: 5s
+      SEARCH_WEB_ENABLE_TLS: "true"
+      SEARCH_WEB_HOST: :4200
+      SEARCH_WEB_IDLE_TIMEOUT: 1m
+      SEARCH_WEB_READ_TIMEOUT: 5s
+      SEARCH_WEB_SESSION_SECRET: ${SESSION_SECRET}
+      SEARCH_WEB_SHUTDOWN_TIMEOUT: 5s
+      SEARCH_WEB_WRITE_TIMEOUT: 5s
     image: ${REGISTRY_ACCOUNT}/search-app-amd64:${VERSION}
     networks:
-      - outside
+      outside:
     ports:
-      - 4200:4200
-    environment:
-      - SEARCH_WEB_HOST=:4200
-      - SEARCH_WEB_ENABLE_TLS=true
-      - SEARCH_WEB_SESSION_SECRET=${SESSION_SECRET}
-      - SEARCH_WEB_IDLE_TIMEOUT=1m
-      - SEARCH_WEB_READ_TIMEOUT=5s
-      - SEARCH_WEB_WRITE_TIMEOUT=5s
-      - SEARCH_WEB_SHUTDOWN_TIMEOUT=5s
-      - SEARCH_SALES_BASE_URL=http://sales-api:3000/v1
-      - SEARCH_SALES_IDLE_TIMEOUT=1m
-      - SEARCH_SALES_READ_TIMEOUT=5s
-      - SEARCH_SALES_WRITE_TIMEOUT=5s
-      - SEARCH_SALES_SHUTDOWN_TIMEOUT=5s
-    user: "100000"
-
-networks:
-  outside:
-    external:
-      name: docker_shared-network
+    - published: 4200
+      target: 4200
+    user: '100000'
