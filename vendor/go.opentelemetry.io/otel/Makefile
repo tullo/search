@@ -13,7 +13,7 @@
 # limitations under the License.
 
 EXAMPLES := $(shell ./get_main_pkgs.sh ./example)
-TOOLS_MOD_DIR := ./tools
+TOOLS_MOD_DIR := ./internal/tools
 
 # All source code and documents. Used in spell check.
 ALL_DOCS := $(shell find . -name '*.md' -type f | sort)
@@ -57,7 +57,7 @@ $(TOOLS_DIR)/gojq: $(TOOLS_MOD_DIR)/go.mod $(TOOLS_MOD_DIR)/go.sum $(TOOLS_MOD_D
 	cd $(TOOLS_MOD_DIR) && \
 	go build -o $(TOOLS_DIR)/gojq github.com/itchyny/gojq/cmd/gojq
 
-precommit: generate build lint examples test
+precommit: dependabot-check license-check generate build lint examples test-benchmarks test
 
 .PHONY: test-with-coverage
 test-with-coverage:
@@ -74,7 +74,7 @@ test-with-coverage:
 
 
 .PHONY: ci
-ci: precommit check-clean-work-tree license-check test-with-coverage test-386
+ci: precommit check-clean-work-tree test-with-coverage test-386
 
 .PHONY: check-clean-work-tree
 check-clean-work-tree:
@@ -124,6 +124,13 @@ examples:
 	   go build .); \
 	done
 
+.PHONY: test-benchmarks
+test-benchmarks:
+	@set -e; for dir in $(ALL_GO_MOD_DIRS); do \
+	  echo "test benchmarks in $${dir}"; \
+	  (cd "$${dir}" && go test -test.benchtime=1ms -run=NONE -bench=. ./...) > /dev/null; \
+	done
+
 .PHONY: lint
 lint: $(TOOLS_DIR)/golangci-lint $(TOOLS_DIR)/misspell
 	set -e; for dir in $(ALL_GO_MOD_DIRS); do \
@@ -155,3 +162,16 @@ license-check:
 	           echo "license header checking failed:"; echo "$${licRes}"; \
 	           exit 1; \
 	   fi
+
+.PHONY: dependabot-check
+dependabot-check:
+	@result=$$( \
+		for f in $$( find . -type f -name go.mod -exec dirname {} \; | sed 's/^.\/\?/\//' ); \
+			do grep -q "$$f" .github/dependabot.yml \
+			|| echo "$$f"; \
+		done; \
+	); \
+	if [ -n "$$result" ]; then \
+		echo "missing go.mod dependabot check:"; echo "$$result"; \
+		exit 1; \
+	fi

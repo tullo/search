@@ -7,14 +7,12 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/dgrijalva/jwt-go"
+	"github.com/dgrijalva/jwt-go/v4"
 	"github.com/tullo/search/internal/forms"
 	"github.com/tullo/search/internal/product"
 	"github.com/tullo/search/internal/user"
-	"go.opentelemetry.io/otel/api/propagation"
-	"go.opentelemetry.io/otel/api/trace"
-	"go.opentelemetry.io/otel/codes"
 	"go.opentelemetry.io/otel/label"
+	"go.opentelemetry.io/otel/trace"
 )
 
 func (app *application) home(w http.ResponseWriter, r *http.Request) {
@@ -35,38 +33,29 @@ func (app *application) home(w http.ResponseWriter, r *http.Request) {
 	ctx, span := trace.SpanFromContext(ctx).Tracer().Start(ctx, "home")
 	defer span.End()
 
-	span.AddEvent(ctx, "Lookup Products")
+	span.AddEvent("Lookup Products")
 	span.SetAttributes(label.String("url", url))
-
-	b3 := trace.B3{InjectEncoding: trace.B3SingleHeader}
-	props := propagation.New(propagation.WithInjectors(b3))
-	propagation.InjectHTTP(ctx, props, req.Header)
 
 	// Do will handle the context level timeout.
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
-		span.SetStatus(codes.Internal, "failure parsing")
 		app.serverError(w, err)
 		return
 	}
 	defer resp.Body.Close()
 
 	if resp.StatusCode == http.StatusUnauthorized {
-		span.AddEvent(ctx, "Unauthorized Request")
-		span.SetStatus(codes.Unauthenticated, "unauthorized")
 		http.Redirect(w, r, "/user/login", http.StatusSeeOther)
 		return
 	}
 
 	// Decode json response into products.
-	span.AddEvent(ctx, "Decode JSON Response")
 	if err := json.NewDecoder(resp.Body).Decode(&products); err != nil {
-		span.SetStatus(codes.Internal, "failure decoding json")
 		app.serverError(w, err)
 		return
 	}
 
-	span.AddEvent(ctx, "Render Home Page")
+	span.AddEvent("Render Home Page")
 
 	if err != nil {
 		app.serverError(w, err)
@@ -102,31 +91,20 @@ func (app *application) showProduct(w http.ResponseWriter, r *http.Request) {
 	ctx, span := trace.SpanFromContext(ctx).Tracer().Start(ctx, "showProduct")
 	defer span.End()
 
-	span.AddEvent(ctx, "Show Product")
-	span.SetAttributes(label.String("url", url))
-
-	b3 := trace.B3{InjectEncoding: trace.B3SingleHeader}
-	props := propagation.New(propagation.WithInjectors(b3))
-	propagation.InjectHTTP(ctx, props, req.Header)
-
 	// Do will handle the context level timeout.
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
-		span.SetStatus(codes.Internal, "failure sending request")
 		app.serverError(w, err)
 		return
 	}
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
-		span.SetStatus(codes.FailedPrecondition, "unexpected status code")
-		span.SetAttributes(label.Int("status code", resp.StatusCode))
 		app.clientError(w, resp.StatusCode)
 		return
 	}
 	// Decode json response into a product.
 	if err := json.NewDecoder(resp.Body).Decode(&product); err != nil {
-		span.SetStatus(codes.Internal, "failure decoding json")
 		app.serverError(w, err)
 		return
 	}
@@ -174,18 +152,10 @@ func (app *application) loginUser(w http.ResponseWriter, r *http.Request) {
 	ctx, span := trace.SpanFromContext(ctx).Tracer().Start(ctx, "loginUser")
 	defer span.End()
 
-	span.AddEvent(ctx, "Login User")
-	span.SetAttributes(label.String("url", url))
-
-	b3 := trace.B3{InjectEncoding: trace.B3SingleHeader}
-	props := propagation.New(propagation.WithInjectors(b3))
-	propagation.InjectHTTP(ctx, props, req.Header)
-
 	// Login with provided credentials.
 	// Do will handle the context level timeout.
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
-		span.SetStatus(codes.Internal, "failure sending request")
 		app.serverError(w, err)
 		return
 	}
@@ -196,7 +166,6 @@ func (app *application) loginUser(w http.ResponseWriter, r *http.Request) {
 	// If the credentials are not valid, add a generic error message to the
 	// form failures map and re-display the login page.
 	if resp.StatusCode != http.StatusOK {
-		span.SetStatus(codes.FailedPrecondition, "login failure: credentials not valid")
 		form.Errors.Add("generic", "Email or Password is incorrect")
 		app.render(w, r, "login.page.tmpl", &templateData{Form: form})
 		return
@@ -207,18 +176,16 @@ func (app *application) loginUser(w http.ResponseWriter, r *http.Request) {
 		Token string `json:"token"`
 	}
 	if err := json.NewDecoder(resp.Body).Decode(&tkn); err != nil {
-		span.SetStatus(codes.Internal, "failure decoding json")
 		app.serverError(w, err)
 		return
 	}
 
-	parser := jwt.Parser{
-		ValidMethods: []string{"RS256"},
-	}
+	var po []jwt.ParserOption
+	po = append(po, jwt.WithValidMethods([]string{"RS256"}))
+	parser := jwt.NewParser(po...)
 	var claims jwt.StandardClaims
 	_, _, err = parser.ParseUnverified(tkn.Token, &claims)
 	if err != nil {
-		span.SetStatus(codes.Internal, "failure parsing jwt claims")
 		app.serverError(w, err)
 		return
 	}
@@ -270,31 +237,21 @@ func (app *application) userProfile(w http.ResponseWriter, r *http.Request) {
 	ctx, span := trace.SpanFromContext(ctx).Tracer().Start(ctx, "userprofile")
 	defer span.End()
 
-	span.AddEvent(ctx, "User Profile")
-	span.SetAttributes(label.String("url", url))
-
-	b3 := trace.B3{InjectEncoding: trace.B3SingleHeader}
-	props := propagation.New(propagation.WithInjectors(b3))
-	propagation.InjectHTTP(ctx, props, req.Header)
-
 	// Do will handle the context level timeout.
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
-		span.SetStatus(codes.Internal, "failure sending request")
 		app.serverError(w, err)
 		return
 	}
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
-		span.SetStatus(codes.FailedPrecondition, "unexpected status code")
 		app.clientError(w, resp.StatusCode)
 		return
 	}
 
 	// Decode json response into a user.
 	if err := json.NewDecoder(resp.Body).Decode(&u); err != nil {
-		span.SetStatus(codes.Internal, "failure decoding json")
 		app.serverError(w, err)
 		return
 	}
