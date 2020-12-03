@@ -17,8 +17,12 @@ import (
 
 func (app *application) home(w http.ResponseWriter, r *http.Request) {
 
+	ctx := r.Context()
+	ctx, span := trace.SpanFromContext(ctx).Tracer().Start(ctx, "home")
+	defer span.End()
+
 	// Create a context with a timeout of 1 second.
-	ctx, cancel := context.WithTimeout(r.Context(), time.Second)
+	ctx, cancel := context.WithTimeout(ctx, time.Second)
 	defer cancel()
 
 	url := fmt.Sprintf("%s/products", app.salesURL)
@@ -27,11 +31,6 @@ func (app *application) home(w http.ResponseWriter, r *http.Request) {
 		app.serverError(w, err)
 		return
 	}
-
-	var products []product.Product
-
-	ctx, span := trace.SpanFromContext(ctx).Tracer().Start(ctx, "home")
-	defer span.End()
 
 	span.AddEvent("Lookup Products")
 	span.SetAttributes(label.String("url", url))
@@ -50,6 +49,7 @@ func (app *application) home(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Decode json response into products.
+	var products []product.Product
 	if err := json.NewDecoder(resp.Body).Decode(&products); err != nil {
 		app.serverError(w, err)
 		return
@@ -74,8 +74,12 @@ func (app *application) about(w http.ResponseWriter, r *http.Request) {
 
 func (app *application) showProduct(w http.ResponseWriter, r *http.Request) {
 
+	ctx := r.Context()
+	ctx, span := trace.SpanFromContext(ctx).Tracer().Start(ctx, "showProduct")
+	defer span.End()
+
 	// Create a context with a timeout of 1 second.
-	ctx, cancel := context.WithTimeout(r.Context(), time.Second)
+	ctx, cancel := context.WithTimeout(ctx, time.Second)
 	defer cancel()
 
 	id := r.URL.Query().Get(":id")
@@ -85,11 +89,6 @@ func (app *application) showProduct(w http.ResponseWriter, r *http.Request) {
 		app.serverError(w, err)
 		return
 	}
-
-	var product product.Product
-
-	ctx, span := trace.SpanFromContext(ctx).Tracer().Start(ctx, "showProduct")
-	defer span.End()
 
 	// Do will handle the context level timeout.
 	resp, err := http.DefaultClient.Do(req)
@@ -104,6 +103,7 @@ func (app *application) showProduct(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	// Decode json response into a product.
+	var product product.Product
 	if err := json.NewDecoder(resp.Body).Decode(&product); err != nil {
 		app.serverError(w, err)
 		return
@@ -128,6 +128,10 @@ func (app *application) loginUserForm(w http.ResponseWriter, r *http.Request) {
 // loginUser checks the provided credentials and redirects the client
 // to the requested path
 func (app *application) loginUser(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	ctx, span := trace.SpanFromContext(ctx).Tracer().Start(ctx, "loginUser")
+	defer span.End()
+
 	err := r.ParseForm()
 	if err != nil {
 		app.clientError(w, http.StatusBadRequest)
@@ -138,7 +142,7 @@ func (app *application) loginUser(w http.ResponseWriter, r *http.Request) {
 	form := forms.New(r.PostForm)
 
 	// Create a context with a timeout of 1 second.
-	ctx, cancel := context.WithTimeout(r.Context(), time.Second)
+	ctx, cancel := context.WithTimeout(ctx, time.Second)
 	defer cancel()
 
 	url := fmt.Sprintf("%s/users/token", app.salesURL)
@@ -148,9 +152,6 @@ func (app *application) loginUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	req.SetBasicAuth(form.Get("email"), form.Get("password"))
-
-	ctx, span := trace.SpanFromContext(ctx).Tracer().Start(ctx, "loginUser")
-	defer span.End()
 
 	// Login with provided credentials.
 	// Do will handle the context level timeout.
@@ -220,8 +221,12 @@ func (app *application) logoutUser(w http.ResponseWriter, r *http.Request) {
 
 func (app *application) userProfile(w http.ResponseWriter, r *http.Request) {
 
+	ctx := r.Context()
+	ctx, span := trace.SpanFromContext(ctx).Tracer().Start(ctx, "userprofile")
+	defer span.End()
+
 	// Create a context with a timeout of 1 second.
-	ctx, cancel := context.WithTimeout(r.Context(), time.Second)
+	ctx, cancel := context.WithTimeout(ctx, time.Second)
 	defer cancel()
 
 	// get user ID from session data
@@ -232,10 +237,6 @@ func (app *application) userProfile(w http.ResponseWriter, r *http.Request) {
 		app.serverError(w, err)
 		return
 	}
-	var u user.User
-
-	ctx, span := trace.SpanFromContext(ctx).Tracer().Start(ctx, "userprofile")
-	defer span.End()
 
 	// Do will handle the context level timeout.
 	resp, err := http.DefaultClient.Do(req)
@@ -251,6 +252,7 @@ func (app *application) userProfile(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Decode json response into a user.
+	var u user.User
 	if err := json.NewDecoder(resp.Body).Decode(&u); err != nil {
 		app.serverError(w, err)
 		return
