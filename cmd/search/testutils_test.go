@@ -26,7 +26,8 @@ func extractCSRFToken(t *testing.T, body []byte) string {
 	matches := csrfTokenRX.FindSubmatch(body)
 	// expecting an array with at least two entries (matched pattern & captured data)
 	if len(matches) < 2 {
-		t.Fatal("no csrf token found in body")
+		t.Log("Matched pattern:", string(matches[0]))
+		t.Fatal("No csrf token found in body")
 	}
 
 	// unescape the rendered and html escaped base64 encoded string value
@@ -35,33 +36,37 @@ func extractCSRFToken(t *testing.T, body []byte) string {
 
 // newTestApplication creates an application struct with mock loggers
 func newTestApplication(t *testing.T) *application {
-	// initialize template cache
+	// Initialize template cache.
 	templateCache, err := newTemplateCache("./../../ui/html/")
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	// session manager instance that mirrors production settings
-	// sample generation of secret bytes 'openssl rand -base64 32'
+	// Session manager instance that mirrors production settings.
+	// Sample generation of secret bytes 'openssl rand -base64 32'.
 	session := sessions.New([]byte("zBtjT1J8wWrvUCuEZf+YbBa41nKYlCKiNLeS5AGdmiQ="))
 	// sessions expire after 12 hours
 	session.Lifetime = 12 * time.Hour
-	// set the secure flag on session cookies
+	// Set the secure flag on session cookies.
 	session.Secure = true
-	// mitigate cross site request forgry csrf
+	// Mitigate cross site request forgry (CSRF).
 	session.SameSite = http.SameSiteStrictMode
 
 	shutdown := make(chan os.Signal, 1)
 	signal.Notify(shutdown, os.Interrupt, syscall.SIGTERM)
 
 	baseURL := "http://0.0.0.0:3000/v1"
-	if u := os.Getenv("SALES_URL"); u != "" {
-		baseURL = u
-	}
 
-	// app struct instantiation using the mocks for the loggers and database models
+	debugURL := "http://0.0.0.0:4000/debug"
+
+	// Identity Provider signing key ID.
+	keyID := "54bb2165-71e1-41a6-af3e-7da4a0e1e2c1"
+
+	// App struct instantiation using mocks for loggers and database models.
 	app := application{
 		debug:         true,
+		debugURL:      debugURL,
+		keyID:         keyID,
 		log:           log.New(ioutil.Discard, "", 0),
 		templateCache: templateCache,
 		salesURL:      baseURL,

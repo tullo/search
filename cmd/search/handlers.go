@@ -15,6 +15,38 @@ import (
 	"go.opentelemetry.io/otel/trace"
 )
 
+func (app *application) ping(w http.ResponseWriter, r *http.Request) {
+
+	ctx, cancel := context.WithTimeout(r.Context(), time.Second)
+	defer cancel()
+
+	url := fmt.Sprintf("%s/liveness", app.debugURL)
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
+	if err != nil {
+		w.Write([]byte(fmt.Sprintf("%v", err)))
+		return
+	}
+
+	// custom header used to get around okteto related issue
+	req.Header.Set("X-Probe", "LivenessProbe")
+
+	// Do will handle the context level timeout.
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		w.Write([]byte(fmt.Sprintf("%v", err)))
+		return
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		msg := fmt.Sprintf("received unexpected response status: %d", resp.StatusCode)
+		w.Write([]byte(msg))
+		return
+	}
+
+	w.Write([]byte("OK"))
+}
+
 func (app *application) home(w http.ResponseWriter, r *http.Request) {
 
 	ctx := r.Context()
@@ -25,7 +57,11 @@ func (app *application) home(w http.ResponseWriter, r *http.Request) {
 	ctx, cancel := context.WithTimeout(ctx, time.Second)
 	defer cancel()
 
-	url := fmt.Sprintf("%s/products", app.salesURL)
+	var (
+		page        = 1
+		rowsPerPage = 20
+	)
+	url := fmt.Sprintf("%s/products/%d/%d", app.salesURL, page, rowsPerPage)
 	req, err := app.newGetRequest(ctx, r, url)
 	if err != nil {
 		app.serverError(w, err)
@@ -145,7 +181,7 @@ func (app *application) loginUser(w http.ResponseWriter, r *http.Request) {
 	ctx, cancel := context.WithTimeout(ctx, time.Second)
 	defer cancel()
 
-	url := fmt.Sprintf("%s/users/token", app.salesURL)
+	url := fmt.Sprintf("%s/users/token/%s", app.salesURL, app.keyID)
 	req, err := app.newGetRequest(ctx, r, url)
 	if err != nil {
 		app.serverError(w, err)

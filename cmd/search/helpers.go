@@ -28,38 +28,6 @@ func (app *application) newGetRequest(ctx context.Context, r *http.Request, url 
 	return req, nil
 }
 
-func (app *application) ping(w http.ResponseWriter, r *http.Request) {
-
-	ctx, cancel := context.WithTimeout(r.Context(), time.Second)
-	defer cancel()
-
-	url := fmt.Sprintf("%s/liveness", app.salesURL)
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
-	if err != nil {
-		w.Write([]byte(fmt.Sprintf("%v", err)))
-		return
-	}
-
-	// custom header used to get around okteto related issue
-	req.Header.Set("X-Probe", "LivenessProbe")
-
-	// Do will handle the context level timeout.
-	resp, err := http.DefaultClient.Do(req)
-	if err != nil {
-		w.Write([]byte(fmt.Sprintf("%v", err)))
-		return
-	}
-	defer resp.Body.Close()
-
-	if resp.StatusCode != http.StatusOK {
-		msg := fmt.Sprintf("received unexpected response status: %d", resp.StatusCode)
-		w.Write([]byte(msg))
-		return
-	}
-
-	w.Write([]byte("OK"))
-}
-
 func (app *application) serverError(w http.ResponseWriter, err error) {
 	trace := fmt.Sprintf("%s\n%s", err.Error(), debug.Stack())
 	// go one step back in the stack trace to get the file name and line number

@@ -32,6 +32,8 @@ const contextKeyIsAuthenticated = contextKey("isAuthenticated")
 // define the interfaces inline to keep the code simple
 type application struct {
 	debug         bool
+	debugURL      string
+	keyID         string
 	log           *log.Logger
 	salesURL      string
 	session       *sessions.Session
@@ -65,6 +67,12 @@ func run(log *log.Logger) error {
 
 	var cfg struct {
 		conf.Version
+		Debug struct {
+			BaseURL string `conf:"default:http://0.0.0.0:4000/debug"`
+		}
+		IdentityProvider struct {
+			KeyID string `conf:"default:54bb2165-71e1-41a6-af3e-7da4a0e1e2c1"`
+		}
 		Web struct {
 			Host            string        `conf:"default::4200"`
 			DebugMode       bool          `conf:"default:false"`
@@ -144,6 +152,8 @@ func run(log *log.Logger) error {
 
 	app := &application{
 		debug:         cfg.Web.DebugMode,
+		debugURL:      cfg.Debug.BaseURL,
+		keyID:         cfg.IdentityProvider.KeyID,
 		log:           log,
 		salesURL:      cfg.Sales.BaseURL,
 		session:       session,

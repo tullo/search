@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
+	"regexp"
 	"testing"
 )
 
@@ -70,6 +71,39 @@ func TestAbout(t *testing.T) {
 	txt := []byte("Lorem ipsum dolor sit amet, consectetur adipiscing elit.")
 	if !bytes.Contains(body, txt) {
 		t.Errorf("want body to contain %q", string(txt))
+	}
+}
+
+func TestLoginUserForm(t *testing.T) {
+	var email = `<input type='email' name='email' value=''>`
+	var password = `<input type='password' name='password'>`
+	var submit = `<input type='submit' value='Login'>`
+	var emailRX = regexp.MustCompile(email)
+	var passwordRX = regexp.MustCompile(password)
+	var loginRX = regexp.MustCompile(submit)
+
+	app := newTestApplication(t)
+
+	ts := newTestServer(t, app.routes())
+	defer ts.Close()
+
+	_, _, body := ts.get(t, "/user/login")
+	csrfToken := extractCSRFToken(t, body)
+
+	if len(csrfToken) < 1 {
+		t.Error("Unexpected CSRF token length")
+	}
+	match := emailRX.FindString(string(body))
+	if match != email {
+		t.Error("No email form field found in body")
+	}
+	match = passwordRX.FindString(string(body))
+	if match != password {
+		t.Error("No password form field found in body")
+	}
+	match = loginRX.FindString(string(body))
+	if match != submit {
+		t.Error("No submit form field found in body")
 	}
 }
 
@@ -244,7 +278,7 @@ func TestShowProduct(t *testing.T) {
 	form.Add("password", "gophers")
 	form.Add("csrf_token", csrfToken)
 
-	// init user session by login
+	// Init session by user login.
 	_, _, _ = ts.postForm(t, "/user/login", form)
 
 	tests := []struct {
