@@ -86,7 +86,9 @@ type testServer struct {
 func newTestServer(t *testing.T, h http.Handler) *testServer {
 
 	// spinup a https server for the duration of the test
-	ts := httptest.NewTLSServer(h)
+	ts := httptest.NewUnstartedServer(h)
+	ts.EnableHTTP2 = true
+	ts.StartTLS()
 
 	jar, err := cookiejar.New(nil)
 	if err != nil {
