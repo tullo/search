@@ -30,8 +30,9 @@ func (app *application) ping(w http.ResponseWriter, r *http.Request) {
 	// custom header used to get around okteto related issue
 	req.Header.Set("X-Probe", "LivenessProbe")
 
-	// Do will handle the context level timeout.
-	resp, err := http.DefaultClient.Do(req)
+	// Client.Do will handle the context level timeout.
+	client := newClient()
+	resp, err := client.Do(req)
 	if err != nil {
 		w.Write([]byte(fmt.Sprintf("%v", err)))
 		return
@@ -71,8 +72,9 @@ func (app *application) home(w http.ResponseWriter, r *http.Request) {
 	span.AddEvent("Lookup Products")
 	span.SetAttributes(label.String("url", url))
 
-	// Do will handle the context level timeout.
-	resp, err := http.DefaultClient.Do(req)
+	// Client.Do will handle the context level timeout.
+	client := newClient()
+	resp, err := client.Do(req)
 	if err != nil {
 		app.serverError(w, err)
 		return
@@ -126,8 +128,9 @@ func (app *application) showProduct(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Do will handle the context level timeout.
-	resp, err := http.DefaultClient.Do(req)
+	// Client.Do will handle the context level timeout.
+	client := newClient()
+	resp, err := client.Do(req)
 	if err != nil {
 		app.serverError(w, err)
 		return
@@ -190,8 +193,9 @@ func (app *application) loginUser(w http.ResponseWriter, r *http.Request) {
 	req.SetBasicAuth(form.Get("email"), form.Get("password"))
 
 	// Login with provided credentials.
-	// Do will handle the context level timeout.
-	resp, err := http.DefaultClient.Do(req)
+	// Client.Do will handle the context level timeout.
+	client := newClient()
+	resp, err := client.Do(req)
 	if err != nil {
 		app.serverError(w, err)
 		return
@@ -274,8 +278,9 @@ func (app *application) userProfile(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Do will handle the context level timeout.
-	resp, err := http.DefaultClient.Do(req)
+	// Client.Do will handle the context level timeout.
+	client := newClient()
+	resp, err := client.Do(req)
 	if err != nil {
 		app.serverError(w, err)
 		return

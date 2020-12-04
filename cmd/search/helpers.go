@@ -12,6 +12,13 @@ import (
 	"github.com/justinas/nosurf"
 )
 
+func newClient() *http.Client {
+	var client http.Client
+	t := http.DefaultTransport.(*http.Transport)
+	client.Transport = t.Clone()
+	return &client
+}
+
 func (app *application) newGetRequest(ctx context.Context, r *http.Request, url string) (*http.Request, error) {
 	req, err := http.NewRequest(http.MethodGet, url, nil)
 	if err != nil {
