@@ -1,6 +1,7 @@
 # Search
 
 ![Go](https://github.com/tullo/search/workflows/Go/badge.svg)
+![CodeQL](https://github.com/tullo/search/workflows/CodeQL/badge.svg)
 
 Search is a simple frontend to the [sales-api](https://github.com/tullo/service) service.
 
