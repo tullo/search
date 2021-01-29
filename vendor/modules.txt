@@ -18,10 +18,10 @@ github.com/openzipkin/zipkin-go/model
 # github.com/pkg/errors v0.9.1
 ## explicit
 github.com/pkg/errors
-# github.com/tullo/conf v1.3.5
+# github.com/tullo/conf v1.3.6
 ## explicit
 github.com/tullo/conf
-# go.opentelemetry.io/otel v0.14.0
+# go.opentelemetry.io/otel v0.16.0
 ## explicit
 go.opentelemetry.io/otel
 go.opentelemetry.io/otel/codes
@@ -38,23 +38,22 @@ go.opentelemetry.io/otel/propagation
 go.opentelemetry.io/otel/semconv
 go.opentelemetry.io/otel/trace
 go.opentelemetry.io/otel/unit
-# go.opentelemetry.io/otel/exporters/trace/zipkin v0.14.0
+# go.opentelemetry.io/otel/exporters/trace/zipkin v0.16.0
 ## explicit
 go.opentelemetry.io/otel/exporters/trace/zipkin
-# go.opentelemetry.io/otel/sdk v0.14.0
+# go.opentelemetry.io/otel/sdk v0.16.0
 ## explicit
 go.opentelemetry.io/otel/sdk/export/trace
 go.opentelemetry.io/otel/sdk/instrumentation
 go.opentelemetry.io/otel/sdk/internal
 go.opentelemetry.io/otel/sdk/resource
 go.opentelemetry.io/otel/sdk/trace
-go.opentelemetry.io/otel/sdk/trace/internal
-# golang.org/x/crypto v0.0.0-20201124201722-c8d3bf9c5392
+# golang.org/x/crypto v0.0.0-20201221181555-eec23a3978ad
 ## explicit
 golang.org/x/crypto/internal/subtle
 golang.org/x/crypto/nacl/secretbox
 golang.org/x/crypto/poly1305
 golang.org/x/crypto/salsa20/salsa
-# golang.org/x/sys v0.0.0-20201202213521-69691e467435
+# golang.org/x/sys v0.0.0-20210124154548-22da62e12c0c
 ## explicit
 golang.org/x/sys/cpu
