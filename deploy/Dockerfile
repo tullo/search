@@ -1,4 +1,4 @@
-FROM golang:1.15.6-alpine3.12 as build_stage
+FROM golang:1.15.7-alpine3.13 as build_stage
 ENV CGO_ENABLED 0
 ARG VCS_REF
 
