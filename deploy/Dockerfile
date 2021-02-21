@@ -1,4 +1,4 @@
-FROM golang:1.15.7-alpine3.13 as build_stage
+FROM golang:1.16.0-alpine3.13 as build_stage
 ENV CGO_ENABLED 0
 ARG VCS_REF
 
@@ -11,13 +11,13 @@ COPY . .
 
 # Build the search binary.
 WORKDIR /app/cmd/search
-RUN go build -ldflags "-X main.build=${VCS_REF}"
+RUN go build -ldflags "-X main.build=${VCS_REF}" -mod=vendor
 # The linker sets 'var build' in main.go to the specified git revision
 # See https://golang.org/cmd/link/ for supported linker flags
 
 
 # Build production image with Go binary, ui and tls.
-FROM alpine:3.12
+FROM alpine:3.13.2
 ARG BUILD_DATE
 ARG VCS_REF
 RUN addgroup -g 3000 -S app && adduser -u 100000 -S app -G app --no-create-home --disabled-password
