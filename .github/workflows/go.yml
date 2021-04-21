@@ -16,7 +16,7 @@ jobs:
     - name: Set up Go 1.16.x
       uses: actions/setup-go@v2
       with:
-        go-version: '1.16.0'
+        go-version: '1.16.3'
       id: go
 
     - name: Check out code into the Go module directory
@@ -30,11 +30,10 @@ jobs:
     - name: Run go vet & static checks
       run: |
         go vet ./cmd/... ./internal/... ./tracer/
-        export WORK=${PWD}
+        GO111MODULE=on go install honnef.co/go/tools/cmd/staticcheck@v0.1.3
         export PATH=$PATH:$(go env GOPATH)/bin
-        cd && GO111MODULE=on go get honnef.co/go/tools/cmd/staticcheck@2020.2.1
         staticcheck -debug.version
-        cd ${WORK} && staticcheck -go 1.15 ./...
+        staticcheck -go 1.16 ./cmd/... ./internal/... ./tracer/
 
     - name: build binaries using vendored deps
       run: |
