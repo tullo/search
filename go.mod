@@ -3,7 +3,7 @@ module github.com/tullo/search
 go 1.15
 
 require (
-	github.com/bmizerany/pat v0.0.0-20170815010413-6226ea591a40
+	github.com/bmizerany/pat v0.0.0-20210406213842-e4b6760bdd6f
 	github.com/dgrijalva/jwt-go/v4 v4.0.0-preview1
 	github.com/golangcollege/sessions v1.2.0
 	github.com/justinas/alice v1.2.0
