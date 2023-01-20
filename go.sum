@@ -45,6 +45,7 @@ github.com/google/go-cmp v0.4.0/go.mod h1:v8dTdLbMG2kIc/vJvl+f65V22dbkXbowE6jgT/
 github.com/google/go-cmp v0.5.0/go.mod h1:v8dTdLbMG2kIc/vJvl+f65V22dbkXbowE6jgT/gNBxE=
 github.com/google/go-cmp v0.5.4 h1:L8R9j+yAqZuZjsqh/z+F1NCffTKKLShY6zXTItVIZ8M=
 github.com/google/go-cmp v0.5.4/go.mod h1:v8dTdLbMG2kIc/vJvl+f65V22dbkXbowE6jgT/gNBxE=
+github.com/google/go-cmp v0.5.5/go.mod h1:v8dTdLbMG2kIc/vJvl+f65V22dbkXbowE6jgT/gNBxE=
 github.com/gorilla/context v1.1.1/go.mod h1:kBGZzfjB9CEq2AlWe17Uuf7NDRt0dE0s8S51q0aT7Yg=
 github.com/gorilla/mux v1.6.2/go.mod h1:1lud6UwP+6orDFRuTfBEV8e9/aOM/c4fVVCaMa2zaAs=
 github.com/hpcloud/tail v1.0.0/go.mod h1:ab1qPbhIpdTxEkNHXyeSf5vhxWSCs/tWer42PpOxQnU=
@@ -71,6 +72,8 @@ github.com/stretchr/testify v1.6.1 h1:hDPOHmpOpP40lSULcqw7IrRb/u7w6RpDC9399XyoNd
 github.com/stretchr/testify v1.6.1/go.mod h1:6Fq8oRcR53rry900zMqJjRRixrwX3KX962/h/Wwjteg=
 github.com/tullo/conf v1.3.6 h1:87pJMQFzKP+N/1oJy7wKyMFbbE7lQ2H2z0tNKoZ7/wo=
 github.com/tullo/conf v1.3.6/go.mod h1:Qz6oN2rlsZVTkawE6MWuz/M/dT8TULyy/yJXXjmwtRw=
+github.com/tullo/conf v1.3.7 h1:9HVPVGE9pWpNX5FqLOH/TlpwZ85KGqKkAyP6Z2QF014=
+github.com/tullo/conf v1.3.7/go.mod h1:L7DGDsffVI2cGYGT5d5nrU+osWxnSu6SUv094k0ijkI=
 go.opentelemetry.io/otel v0.16.0 h1:uIWEbdeb4vpKPGITLsRVUS44L5oDbDUCZxn8lkxhmgw=
 go.opentelemetry.io/otel v0.16.0/go.mod h1:e4GKElweB8W2gWUqbghw0B8t5MCTccc9212eNHnOHwA=
 go.opentelemetry.io/otel/exporters/trace/zipkin v0.16.0 h1:L3dwjQ8KgtLtZ55xKDdC121DzHdU3NaKcbmnAGa89lY=
