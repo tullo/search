@@ -3,7 +3,7 @@ package tracer
 import (
 	"log"
 
-	"go.opentelemetry.io/otel/exporters/trace/zipkin"
+	"go.opentelemetry.io/otel/exporters/zipkin"
 	sdktrace "go.opentelemetry.io/otel/sdk/trace"
 )
 

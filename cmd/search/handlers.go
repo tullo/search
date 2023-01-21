@@ -11,7 +11,7 @@ import (
 	"github.com/tullo/search/internal/forms"
 	"github.com/tullo/search/internal/product"
 	"github.com/tullo/search/internal/user"
-	"go.opentelemetry.io/otel/label"
+	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/trace"
 )
 
@@ -70,7 +70,7 @@ func (app *application) home(w http.ResponseWriter, r *http.Request) {
 	}
 
 	span.AddEvent("Lookup Products")
-	span.SetAttributes(label.String("url", url))
+	span.SetAttributes(attribute.String("url", url))
 
 	// Client.Do will handle the context level timeout.
 	client := newClient()
