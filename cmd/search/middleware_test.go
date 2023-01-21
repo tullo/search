@@ -1,7 +1,7 @@
 package main
 
 import (
-	"io/ioutil"
+	"io"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -44,7 +44,7 @@ func TestSecureHeaders(t *testing.T) {
 	}
 
 	// check the response body
-	body, err := ioutil.ReadAll(rs.Body)
+	body, err := io.ReadAll(rs.Body)
 	if err != nil {
 		t.Fatal(err)
 	}

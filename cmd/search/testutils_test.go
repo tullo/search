@@ -2,7 +2,7 @@ package main
 
 import (
 	"html"
-	"io/ioutil"
+	"io"
 	"log"
 	"net/http"
 	"net/http/cookiejar"
@@ -67,7 +67,7 @@ func newTestApplication(t *testing.T) *application {
 		debug:         true,
 		debugURL:      debugURL,
 		keyID:         keyID,
-		log:           log.New(ioutil.Discard, "", 0),
+		log:           log.New(io.Discard, "", 0),
 		templateCache: templateCache,
 		salesURL:      baseURL,
 		session:       session,
@@ -117,7 +117,7 @@ func (ts *testServer) get(t *testing.T, urlPath string) (int, http.Header, []byt
 	}
 	defer rs.Body.Close()
 
-	body, err := ioutil.ReadAll(rs.Body)
+	body, err := io.ReadAll(rs.Body)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -134,7 +134,7 @@ func (ts *testServer) postForm(t *testing.T, urlPath string, form url.Values) (i
 	}
 	defer rs.Body.Close()
 
-	body, err := ioutil.ReadAll(rs.Body)
+	body, err := io.ReadAll(rs.Body)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -149,7 +149,7 @@ func (ts *testServer) clientDo(t *testing.T, r *http.Request) (int, http.Header,
 	}
 	defer rs.Body.Close()
 
-	body, err := ioutil.ReadAll(rs.Body)
+	body, err := io.ReadAll(rs.Body)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -180,7 +180,7 @@ func (ts *testServer) getCheckRedirect(t *testing.T, urlPath string, s *sessions
 	}
 	defer rs.Body.Close()
 
-	body, err := ioutil.ReadAll(rs.Body)
+	body, err := io.ReadAll(rs.Body)
 	if err != nil {
 		t.Fatal(err)
 	}
