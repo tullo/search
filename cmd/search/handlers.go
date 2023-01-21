@@ -11,9 +11,11 @@ import (
 	"github.com/tullo/search/internal/forms"
 	"github.com/tullo/search/internal/product"
 	"github.com/tullo/search/internal/user"
+	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/attribute"
-	"go.opentelemetry.io/otel/trace"
 )
+
+const name = "search"
 
 func (app *application) ping(w http.ResponseWriter, r *http.Request) {
 
@@ -50,8 +52,7 @@ func (app *application) ping(w http.ResponseWriter, r *http.Request) {
 
 func (app *application) home(w http.ResponseWriter, r *http.Request) {
 
-	ctx := r.Context()
-	ctx, span := trace.SpanFromContext(ctx).Tracer().Start(ctx, "home")
+	ctx, span := otel.Tracer(name).Start(r.Context(), "home")
 	defer span.End()
 
 	// Create a context with a timeout of 1 second.
@@ -112,8 +113,7 @@ func (app *application) about(w http.ResponseWriter, r *http.Request) {
 
 func (app *application) showProduct(w http.ResponseWriter, r *http.Request) {
 
-	ctx := r.Context()
-	ctx, span := trace.SpanFromContext(ctx).Tracer().Start(ctx, "showProduct")
+	ctx, span := otel.Tracer(name).Start(r.Context(), "showProduct")
 	defer span.End()
 
 	// Create a context with a timeout of 1 second.
@@ -167,8 +167,8 @@ func (app *application) loginUserForm(w http.ResponseWriter, r *http.Request) {
 // loginUser checks the provided credentials and redirects the client
 // to the requested path
 func (app *application) loginUser(w http.ResponseWriter, r *http.Request) {
-	ctx := r.Context()
-	ctx, span := trace.SpanFromContext(ctx).Tracer().Start(ctx, "loginUser")
+
+	ctx, span := otel.Tracer(name).Start(r.Context(), "loginUser")
 	defer span.End()
 
 	err := r.ParseForm()
@@ -261,8 +261,7 @@ func (app *application) logoutUser(w http.ResponseWriter, r *http.Request) {
 
 func (app *application) userProfile(w http.ResponseWriter, r *http.Request) {
 
-	ctx := r.Context()
-	ctx, span := trace.SpanFromContext(ctx).Tracer().Start(ctx, "userprofile")
+	ctx, span := otel.Tracer(name).Start(r.Context(), "userprofile")
 	defer span.End()
 
 	// Create a context with a timeout of 1 second.

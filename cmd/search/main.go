@@ -183,9 +183,16 @@ func run(log *log.Logger) error {
 
 	log.Println("Initializing zipkin tracing support")
 
-	if err := tracer.Init(cfg.Zipkin.ServiceName, cfg.Zipkin.ReporterURI, cfg.Zipkin.Probability, log); err != nil {
+	shutdownTP, err := tracer.Init(cfg.Zipkin.ServiceName, cfg.Zipkin.ReporterURI, cfg.Zipkin.Probability, log)
+	if err != nil {
 		return errors.Wrap(err, "starting tracer")
 	}
+
+	defer func() {
+		if err := shutdownTP(context.Background()); err != nil {
+			log.Fatal("failed to shutdown TracerProvider: %w", err)
+		}
+	}()
 
 	// Make a channel to listen for errors coming from the listener. Use a
 	// buffered channel so the goroutine can exit if we don't collect this error.
