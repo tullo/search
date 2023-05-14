@@ -5,6 +5,7 @@
   ],
   "packageRules": [
     {
+      "matchDatasources": ["docker"],
       "matchUpdateTypes": ["minor", "patch"],
       "matchPackageNames": ["alpine", "golangd"],
       "automerge": true
