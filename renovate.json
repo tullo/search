@@ -8,11 +8,11 @@
       "matchDatasources": ["docker"],
       "matchUpdateTypes": ["minor", "patch"],
       "matchPackageNames": ["alpine", "golangd"],
-      "automerge": true
+      "automerge": true,
+      "platformAutomerge": true,
+      "automergeType": "branch",
+      "automergeStrategy": "rebase",
+      "commitBodyTable": true
     }
-  ],
-  "automerge": true,
-  "automergeType": "branch",
-  "automergeStrategy": "rebase",
-  "commitBodyTable": true  
+  ]
 }
