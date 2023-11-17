@@ -10,17 +10,17 @@ require (
 	github.com/justinas/nosurf v1.1.1
 	github.com/pkg/errors v0.9.1
 	github.com/tullo/conf v1.3.7
-	go.opentelemetry.io/otel v1.20.0
-	go.opentelemetry.io/otel/exporters/zipkin v1.20.0
-	go.opentelemetry.io/otel/sdk v1.20.0
+	go.opentelemetry.io/otel v1.21.0
+	go.opentelemetry.io/otel/exporters/zipkin v1.21.0
+	go.opentelemetry.io/otel/sdk v1.21.0
 )
 
 require (
 	github.com/go-logr/logr v1.3.0 // indirect
 	github.com/go-logr/stdr v1.2.2 // indirect
 	github.com/openzipkin/zipkin-go v0.4.2 // indirect
-	go.opentelemetry.io/otel/metric v1.20.0 // indirect
-	go.opentelemetry.io/otel/trace v1.20.0 // indirect
+	go.opentelemetry.io/otel/metric v1.21.0 // indirect
+	go.opentelemetry.io/otel/trace v1.21.0 // indirect
 	golang.org/x/crypto v0.11.0 // indirect
 	golang.org/x/sys v0.14.0 // indirect
 )
