@@ -15,7 +15,13 @@ spec:
         service: search-app
     spec:
       securityContext:
-        runAsUser: 1000
+        allowPrivilegeEscalation: false
+        capabilities:
+          drop:
+            - ALL
+          add: ['NET_BIND_SERVICE']
+        readOnlyRootFilesystem: true
+        runAsUser: 10000
         runAsGroup: 1000
         fsGroup: 1000
       containers:
