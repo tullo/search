@@ -27,15 +27,15 @@ spec:
       containers:
       - name: search-app
         image: registry.cloud.okteto.net/tullo/search-app-amd64:0.1.0
-        capabilities:
-          drop:
-            - ALL
-          add: ['NET_BIND_SERVICE']        
         securityContext:
           runAsNonRoot: true
           runAsUser: 10000
           readOnlyRootFilesystem: true
-          allowPrivilegeEscalation: false      
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop:
+              - ALL
+            add: ['NET_BIND_SERVICE']        
         env:
         - name: SEARCH_WEB_HOST
           value: :8080
