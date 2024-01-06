@@ -27,6 +27,11 @@ spec:
       containers:
       - name: search-app
         image: registry.cloud.okteto.net/tullo/search-app-amd64:0.1.0
+        securityContext:
+          runAsNonRoot: true
+          runAsUser: 10000
+          readOnlyRootFilesystem: true
+          allowPrivilegeEscalation: false      
         env:
         - name: SEARCH_WEB_HOST
           value: :8080
