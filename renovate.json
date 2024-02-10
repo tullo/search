@@ -5,14 +5,15 @@
   ],
   "packageRules": [
     {
-      "matchDatasources": ["docker"],
-      "matchUpdateTypes": ["minor", "patch"],
-      "matchPackageNames": ["alpine", "golangd"],
-      "automerge": true,
-      "platformAutomerge": true,
-      "automergeType": "branch",
-      "automergeStrategy": "rebase",
-      "commitBodyTable": true
+      "matchUpdateTypes": ["minor", "patch", "pin", "digest"],
+      "automerge": true
     }
-  ]
+  ],
+  "automerge": true,
+  "autoApprove": true,
+  "dependencyDashboardApproval": false,
+  "patch": {"autoApprove": true, "automerge": true},
+  "postUpdateOptions": ["gomodTidy"],
+  "constraints": {"go": "1.21"},
+  "ignoreTests": true
 }
