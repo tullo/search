@@ -13,10 +13,10 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
 
-    - name: Set up Go 1.19.x
+    - name: Set up Go 1.22.x
       uses: actions/setup-go@v5
       with:
-        go-version: '1.19.4'
+        go-version: '1.22.2'
       id: go
 
     - name: Check out code into the Go module directory
@@ -30,10 +30,10 @@ jobs:
     - name: Run go vet & static checks
       run: |
         go vet ./cmd/... ./internal/... ./tracer/
-        GO111MODULE=on go install honnef.co/go/tools/cmd/staticcheck@v0.3.3
+        GO111MODULE=on go install honnef.co/go/tools/cmd/staticcheck@v0.4.7
         export PATH=$PATH:$(go env GOPATH)/bin
         staticcheck -debug.version
-        staticcheck -go 1.19 ./cmd/... ./internal/... ./tracer/
+        staticcheck -go 1.22 ./cmd/... ./internal/... ./tracer/
 
     - name: build binaries using vendored deps
       run: |
