@@ -27,13 +27,14 @@ jobs:
         lfs: 'false'
         submodules: 'false'
 
-    - name: Run go vet & static checks
+    - name: Run go vet
       run: |
         go vet ./cmd/... ./internal/... ./tracer/
-        GO111MODULE=on go install honnef.co/go/tools/cmd/staticcheck@v0.4.7
-        export PATH=$PATH:$(go env GOPATH)/bin
-        staticcheck -debug.version
-        staticcheck -go 1.23 ./cmd/... ./internal/... ./tracer/
+
+    - uses: dominikh/staticcheck-action@v1.2.0
+      with:
+        version: "2022.1.1"
+        install-go: false
 
     - name: build binaries using vendored deps
       run: |
