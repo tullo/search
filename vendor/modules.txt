@@ -20,7 +20,7 @@ github.com/google/uuid
 # github.com/justinas/alice v1.2.0
 ## explicit; go 1.12
 github.com/justinas/alice
-# github.com/justinas/nosurf v1.1.1
+# github.com/justinas/nosurf v1.2.0
 ## explicit; go 1.12
 github.com/justinas/nosurf
 # github.com/openzipkin/zipkin-go v0.4.3
