@@ -17,7 +17,7 @@ RUN go build -ldflags "-X main.build=${VCS_REF}" -mod=vendor
 
 
 # Build production image with Go binary, ui and tls.
-FROM alpine:3.21.3
+FROM alpine:3.22.0
 ARG BUILD_DATE
 ARG VCS_REF
 RUN addgroup -g 3000 -S app && adduser -u 100000 -S app -G app --no-create-home --disabled-password
