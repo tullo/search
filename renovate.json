@@ -22,7 +22,8 @@
     "automerge": true
   },
   "postUpdateOptions": [
-    "gomodTidy"
+    "gomodTidy",
+    "gomodVendor"
   ],
   "constraints": {
     "go": "1.25"
