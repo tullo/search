@@ -29,6 +29,7 @@ jobs:
 
     - name: Run go vet
       run: |
+        go mod vendor
         go vet ./cmd/... ./internal/... ./tracer/
 
     - uses: dominikh/staticcheck-action@v1.4.0
