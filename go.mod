@@ -2,7 +2,7 @@ module github.com/tullo/search
 
 go 1.24.0
 
-toolchain go1.25.6
+toolchain go1.25.7
 
 require (
 	github.com/bmizerany/pat v0.0.0-20210406213842-e4b6760bdd6f
