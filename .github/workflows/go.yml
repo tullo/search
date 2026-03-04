@@ -31,7 +31,7 @@ jobs:
       run: |
         go vet ./cmd/... ./internal/... ./tracer/
 
-    - uses: dominikh/staticcheck-action@v1.4.0
+    - uses: dominikh/staticcheck-action@v1.4.1
       with:
         version: "latest"
         install-go: false
